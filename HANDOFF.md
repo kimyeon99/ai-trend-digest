@@ -31,12 +31,8 @@ frontend 항목을 넓힐지 정해야 한다. profile을 바꾼 뒤 IQuest-Q1(�
 6. (선택) vercel.json ignoreCommand로 daily 커밋마다 재빌드되는 것 방지
 7. PLAN.md 갱신: 모델 결정, 점수 공식, 백필 방침, 튜닝 이력
 
-## 튜닝 이력 메모 (7단계에서 PLAN에 기록)
-2026-10-26 데이터로 세 번 실행했다.
-- 같은 profile로 2회: 노이즈는 대체로 ±5점, 최대 20점
-- profile 수정 후: 로봇·물리 에이전트 40점대 → 5~15점, RAG·메모리 +15~35점, 최고점 65 → 80, 코딩 에이전트는 하락
-- 인사이트: 제목과 점수만으로는 사람이 판단하기 어렵다. 핵심 가치는 요약 품질이다.
-- M3 과제: exclude 우선 규칙 명시, 노이즈 측정
+## 튜닝 이력
+`docs/tuning-log.md`에 기록한다. 첫 기록은 2026-10-28 profile 수정 전후 비교(노이즈 측정 포함)다. profile이나 채점 기준을 바꿀 때마다 같은 형식으로 추가한다. 7단계에서 PLAN 변경 이력에 이 파일 링크를 남긴다.
 
 ## 환경 주의사항
 - WSL(Ubuntu)에서 작업하고, VS Code는 "Reopen Folder in WSL"로 연다. Windows git으로 WSL 폴더를 다루면 "dubious ownership" 에러가 난다.
