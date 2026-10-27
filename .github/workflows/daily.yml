@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       date:
-        description: "Day to collect (YYYY-MM-DD). Empty means yesterday in JST."
+        description: "날짜 입력 (YYYY-MM-DD). 입력하지 않으면 어제 날짜로 설정됨"
         required: false
 
 permissions:
