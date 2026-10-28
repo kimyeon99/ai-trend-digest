@@ -23,7 +23,7 @@ frontend 항목을 넓힐지 정해야 한다. profile을 바꾼 뒤 IQuest-Q1(�
 - 추천안 B: `프론트엔드 개발에 쓰는 AI 도구 (코딩 에이전트, IDE 통합)` → `AI 코딩 도구 (코딩 에이전트, CLI, IDE 통합)`
 
 ## 다음 단계 (순서대로)
-1. 위 결정 반영 → score-preview로 2026-10-26을 재실행해 비교
+1. 위 결정 반영 → score-preview로 2026-10-23을 재실행해 비교
 2. `daily.yml`에 Score 단계 추가 (`ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}`). Commit 단계에 `if: ${{ !cancelled() }}`를 붙여, 채점이 실패해도 수집 데이터는 저장
 3. `pipeline/publish_weekly.py`: 그 주 7일치 upvotes 재수집 → 미채점 항목 채점 → `final = 0.7*relevance + 0.3*upvote_score`(그 주 안에서 log 정규화한 0~100) → Top 5 → claude-sonnet-5-5로 headline과 논문별 3줄 요약·실무 연결·난이도(1~3)를 한국어로 작성(근거는 abstract만) → `data/weekly/YYYY-Www.json` (형식은 PLAN 5절)
 4. `.github/workflows/weekly.yml`: cron `0 22 * * 0`, 수동 실행 시 week 입력, concurrency 그룹 `data-commit`
