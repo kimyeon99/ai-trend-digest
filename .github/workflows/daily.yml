@@ -33,7 +33,15 @@ jobs:
           DATE: ${{ inputs.date }}
         run: uv run python collect.py ${DATE:+--date "$DATE"}
 
+      - name: Score
+        env:
+          DATE: ${{ inputs.date }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: uv run python score.py ${DATE:+--date "$DATE"}
+
+      # 채점이 실패해도 수집한 데이터는 저장한다
       - name: Commit data
+        if: ${{ !cancelled() }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -42,6 +50,6 @@ jobs:
             echo "No changes"
             exit 0
           fi
-          git commit -m "chore: 일일 논문 수집"
+          git commit -m "chore: 일일 논문 수집·채점"
           git pull --rebase
           git push
