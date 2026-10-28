@@ -1,16 +1,36 @@
 import json
 from datetime import date
 
+import pytest
+
 import publish_weekly
+from publish_weekly import PaperWriteup, Writeup
 
 
 def make_item(item_id: str, upvotes: int, relevance: int = 50) -> dict:
     return {
         "id": item_id,
         "title": f"title {item_id}",
+        "url": f"https://example.com/{item_id}",
+        "text": f"abstract {item_id}",
         "signals": {"upvotes": upvotes},
         "score": {"relevance": relevance, "reason": ""},
     }
+
+
+def make_writeup(ids: list[str], summary_lines: int = 3, difficulty: int = 2) -> Writeup:
+    return Writeup(
+        headline="이번 주 요약",
+        papers=[
+            PaperWriteup(
+                id=i,
+                summary=[f"{i} 요약 {n}" for n in range(summary_lines)],
+                practical=f"{i} 실무 연결",
+                difficulty=difficulty,
+            )
+            for i in ids
+        ],
+    )
 
 
 def test_week_days_returns_monday_to_sunday():
@@ -63,3 +83,55 @@ def test_gather_refreshes_and_scores_every_day(tmp_path):
 
     assert calls == [(step, day) for day in days for step in ("refresh", "score")]
     assert [item["id"] for item in items] == ["same"]
+
+
+def test_build_issue_follows_top_order_and_weekly_format():
+    top = [make_item("b", 9), make_item("a", 1)]
+
+    issue = publish_weekly.build_issue("2026-W44", 40, top, make_writeup(["a", "b"]))
+
+    assert issue["period"] == {"from": "2026-10-26", "to": "2026-11-01"}
+    assert issue["stats"] == {"collected": 40, "published": 2}
+    assert issue["headline"] == "이번 주 요약"
+    assert [paper["itemId"] for paper in issue["papers"]] == ["b", "a"]
+    assert issue["papers"][0] == {
+        "itemId": "b",
+        "title": "title b",
+        "url": "https://example.com/b",
+        "summary": ["b 요약 0", "b 요약 1", "b 요약 2"],
+        "practical": "b 실무 연결",
+        "difficulty": 2,
+    }
+
+
+@pytest.mark.parametrize(
+    "writeup",
+    [
+        make_writeup(["a"]),
+        make_writeup(["a", "b", "c"]),
+        make_writeup(["a", "b"], summary_lines=2),
+        make_writeup(["a", "b"], difficulty=4),
+    ],
+    ids=["missing", "extra", "two-line-summary", "difficulty-out-of-range"],
+)
+def test_build_issue_rejects_invalid_writeup(writeup):
+    top = [make_item("a", 1), make_item("b", 1)]
+
+    with pytest.raises(ValueError):
+        publish_weekly.build_issue("2026-W44", 2, top, writeup)
+
+
+def test_publish_sends_only_top_items_and_writes_file(tmp_path):
+    items = [make_item(f"p{n}", upvotes=n, relevance=n * 10) for n in range(1, 8)]
+    prompts = []
+
+    def fake_write(prompt):
+        prompts.append(prompt)
+        return make_writeup([f"p{n}" for n in range(3, 8)])
+
+    publish_weekly.publish("2026-W44", items, weekly_dir=tmp_path, write=fake_write)
+
+    saved = json.loads((tmp_path / "2026-W44.json").read_text(encoding="utf-8"))
+    assert saved["stats"] == {"collected": 7, "published": 5}
+    assert [paper["itemId"] for paper in saved["papers"]] == ["p7", "p6", "p5", "p4", "p3"]
+    assert 'id="p3"' in prompts[0] and 'id="p2"' not in prompts[0]
