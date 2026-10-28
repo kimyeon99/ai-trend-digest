@@ -1,0 +1,51 @@
+name: weekly
+
+on:
+  schedule:
+    - cron: "0 22 * * 0" # 월 07:00 JST
+  workflow_dispatch:
+    inputs:
+      week:
+        description: "주차 입력 (YYYY-Www, 예: 2026-W45). 입력하지 않으면 지난주로 설정됨"
+        required: false
+
+permissions:
+  contents: write
+
+# daily and weekly both commit to data/, so never run them at the same time
+concurrency:
+  group: data-commit
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pipeline
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.3.2
+
+      - name: Publish
+        env:
+          WEEK: ${{ inputs.week }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: uv run python publish_weekly.py ${WEEK:+--week "$WEEK"}
+
+      # 작성이 실패해도 갱신한 추천 수와 채점 결과는 저장한다
+      - name: Commit data
+        if: ${{ !cancelled() }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # data/weekly does not exist until the first issue, and naming a missing path fails git add
+          git add ../data
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git commit -m "chore: 주간 호 발행"
+          git pull --rebase
+          git push
