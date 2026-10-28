@@ -8,7 +8,7 @@ profile.yaml이나 채점 기준을 바꿀 때마다 무엇을 왜 바꿨고 결
 
 ### 조건
 
-- 데이터: `data/daily/2026-10-26.json` (49편)
+- 데이터: `data/daily/2026-10-23.json` (49편)
 - 모델: claude-haiku-5-5, effort low, 채점 기준(`score.py`의 `SYSTEM_PROMPT`)은 바꾸지 않음
 - ① 이전 profile · ② 이전 profile 재실행 · ③ 새 profile
   - ②는 원래 새 profile을 시험하려던 실행이었다. push하기 전에 돌려서 같은 profile로 두 번 돌린 결과가 됐고, 덕분에 노이즈를 잴 수 있었다.
