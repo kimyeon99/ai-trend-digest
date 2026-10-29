@@ -71,17 +71,23 @@
 ## 5. 시스템 구성
 
 ```
-[매일 06:00 JST]  GitHub Actions (cron: 0 21 * * *)
-  수집 → 정규화·중복 제거 → 저가 모델로 관련도 점수(profile.yaml 기준)
-  → data/daily/YYYY-MM-DD.json 커밋
+[매일 06:00 JST]  GitHub Actions daily.yml (cron: 0 21 * * *)
+  collect.py: 전날 HF Daily Papers 수집 (재실행하면 추천 수만 갱신)
+  → score.py: 점수 없는 항목만 관련도 채점 (profile.yaml 기준)
+  → data/daily/YYYY-MM-DD.json 커밋 (채점이 실패해도 수집 결과는 커밋)
 
-[매주 월 07:00 JST]  GitHub Actions (cron: 0 22 * * 0)
-  직전 주(월~일) 항목에서 트랙별 Top N 선정 → 상위 모델로 요약·판정 작성
+[매주 월 07:00 JST]  GitHub Actions weekly.yml (cron: 0 22 * * 0)
+  publish_weekly.py: 직전 주(월~일) 7일치 추천 수 재수집 → 미채점 항목 채점
+  → id로 중복 제거 → final = 0.7×관련도 + 0.3×추천 수 점수 → Top 5
+  → 상위 모델로 한 줄 요약·3줄 요약·실무 연결·난이도 작성 (응답 id·형식 검증)
   → data/weekly/YYYY-Www.json 커밋 → Vercel 재빌드
 
-[프론트]  Next.js (SSG) + TypeScript
-  주간 페이지 / 지난 호 목록 / 걸러진 항목 보기
+[프론트]  Next.js 16 + TypeScript, Vercel
+  최신 호(/) + 지난 호 목록 / 주차별 상세(/weeks/[week])
+  빌드 때 data/weekly를 읽어 정적 생성. 화면과 무관한 커밋은 빌드 생략 (vercel.json)
 ```
+
+- **추천 수 점수:** 그 주 최댓값 기준 log 정규화(0~100). 추천 수는 353과 8처럼 차이가 커서, 그대로 쓰면 상위 몇 편이 점수를 독차지한다.
 
 - **파이프라인은 Python, 프론트는 TypeScript.** 파이프라인(수집·점수·발행)을 Python으로 짜서 Python과 백엔드 쪽 근거를 만든다. AI 쪽 공고 대부분이 Python을 쓴다. 대신 개발 속도가 느려지는 것은 감수한다.
 - **처음부터 공개 저장소.** 이력서와 포트폴리오에 바로 링크를 건다. API 키는 GitHub Actions Secrets에만 두고, `.env`와 DB 덤프 같은 파일은 커밋하지 않는다.
@@ -89,28 +95,37 @@
 - **선별 기준은 설정 파일에 둔다.** `profile.yaml`에 관심사를 적고, 튜닝 과정을 기록으로 남긴다.
 - **LLM 출력은 JSON 스키마로 받는다.** 자유 텍스트를 파싱하지 않는다.
 - **선별 점수는 LLM 혼자 정하지 않는다.** HF 추천 수 같은 외부 신호와 섞는다.
-- **모델은 둘로 나눈다.** 매일 점수 매기기는 저가 모델, 주간 작성은 상위 모델을 쓴다. 구체적인 모델은 M1에서 정한다.
+- **모델은 둘로 나눈다.** 매일 점수 매기기는 `claude-haiku-5-5`(effort low, 하루치를 한 번에 채점), 주간 작성은 `claude-sonnet-5-5`(effort high, 안전 분류기가 거절하면 API가 다른 모델로 재시도)를 쓴다.
 
-### 디렉터리 구조 (예정)
+### 디렉터리 구조
 
 ```
 ai-trend-digest/
 ├─ PLAN.md
+├─ HANDOFF.md            # 다른 PC·새 세션에서 이어서 작업할 때 읽는 문서
 ├─ profile.yaml          # 관심사·제외 주제
-├─ sources.yaml          # 트랙별 소스 목록
-├─ pipeline/             # 수집·선별·발행 스크립트 (Python)
+├─ sources.yaml          # 트랙별 소스 목록 (M2)
+├─ vercel.json           # 화면과 무관한 커밋은 빌드 생략
+├─ docs/tuning-log.md    # profile·채점 기준 튜닝 기록
+├─ pipeline/             # 수집·선별·발행 스크립트 (Python 3.13, uv)
 │  ├─ pyproject.toml
+│  ├─ common.py
 │  ├─ collect.py
 │  ├─ score.py
-│  └─ publish_weekly.py
+│  ├─ publish_weekly.py
+│  └─ tests/
 ├─ data/
 │  ├─ daily/2026-10-26.json
 │  ├─ weekly/2026-W44.json
-│  └─ reviews/2026-W44.md   # 내가 읽고 남기는 평가 (지표용)
+│  └─ reviews/2026-W44.md   # 내가 읽고 남기는 평가 (지표용, M3)
 ├─ src/                  # Next.js 앱
+│  ├─ lib/issues.ts      # data/weekly 읽기
+│  ├─ components/IssueView.tsx
+│  └─ app/ (page.tsx, weeks/[week]/page.tsx)
 └─ .github/workflows/
    ├─ daily.yml
-   └─ weekly.yml
+   ├─ weekly.yml
+   └─ score-preview.yml  # 수동 실행. 채점 결과를 로그로만 출력 (profile 튜닝용)
 ```
 
 ### profile.yaml (초안)
@@ -202,13 +217,13 @@ exclude:
 
 ### M1. Papers 트랙 (10/31 ~ 11/8)
 
-- [ ] Next.js + TypeScript 프로젝트 생성, Vercel 연결
-- [ ] Python 파이프라인 환경 구성 (`pipeline/pyproject.toml`)
-- [ ] HF Daily Papers 수집 → `data/daily/*.json`
-- [ ] `profile.yaml` 기반 관련도 점수 (JSON 스키마 출력)
-- [ ] 주간 발행 스크립트 → `data/weekly/*.json`
-- [ ] 주간 페이지 + 지난 호 목록
-- [ ] GitHub Actions: daily / weekly
+- [x] Next.js + TypeScript 프로젝트 생성, Vercel 연결 (https://ai-trend-digest-one.vercel.app)
+- [x] Python 파이프라인 환경 구성 (`pipeline/pyproject.toml`)
+- [x] HF Daily Papers 수집 → `data/daily/*.json`
+- [x] `profile.yaml` 기반 관련도 점수 (JSON 스키마 출력)
+- [x] 주간 발행 스크립트 → `data/weekly/*.json`
+- [x] 주간 페이지 + 지난 호 목록
+- [x] GitHub Actions: daily / weekly (W43으로 수동 실행해 0호 발행 확인)
 
 **완료 기준:** daily cron이 3일 연속 성공하고, weekly를 수동 실행해서 1호 페이지가 배포된다.
 
@@ -285,6 +300,13 @@ exclude:
 | 2026-10-25 | 공개 범위를 "처음부터 공개"로 결정                                    | 이력서·포트폴리오에 바로 링크를 걸기 위해                                      |
 | 2026-10-25 | 일정을 지원 마감(11/15, 12월 초)에 맞추고, M4 운영을 M1 직후부터 병행 | 마감 전에 링크를 걸고, 12월 초까지 지표와 회고를 갖추기 위해                   |
 | 2026-10-27 | 배포는 M1에서 Vercel로 하고, AWS 이전은 다음 단계로 미룸              | AWS 설정에서 막혀 1호 발행(11/9)이 밀리는 것을 피하기 위해. 이전 과정은 회고 재료로 쓴다 |
+| 2026-10-28 | 모델 결정: 채점 Haiku 5.5(effort low), 주간 작성 Sonnet 5.5(effort high) | 채점은 매일 50편 분량이라 싸야 한다. 요약 품질은 이 제품의 핵심이고 주 1회 호출이라 비용 차이가 작다 |
+| 2026-10-28 | profile을 frontend/backend/ai_agent로 나누고 물리 세계 에이전트를 exclude에 추가 | "에이전트"라는 단어만으로 로봇·3D 에이전트가 35~45점을 받았다. [튜닝 기록](docs/tuning-log.md) |
+| 2026-10-28 | frontend 관심사를 "AI 코딩 도구 (코딩 에이전트, CLI, IDE 통합)"로 넓힘 | backend 항목 추가 뒤 코딩 CLI 에이전트 논문이 상위 5에서 빠졌다. 변경 후 55→70점. [튜닝 기록](docs/tuning-log.md) |
+| 2026-10-28 | 선정 공식을 `0.7×관련도 + 0.3×추천 수(그 주 안 log 정규화)`로 정함 | 추천 수만 쓰면 HF 인기순과 같아지고 큰 연구실 논문에 치우친다. LLM 점수만 쓰면 같은 입력에도 최대 30점까지 흔들린다. log 정규화 덕분에 0.3으로도 추천 수가 많은 논문이 상위에 오른다(10/27 데이터로 확인). 1주치 데이터가 쌓이면 다른 비율과 비교한다 |
+| 2026-10-28 | 백필은 주간 발행 때 한다: 그 주 7일을 다시 수집하고 미채점 항목을 채점 | 수집을 시작하기 전 날짜나 daily 채점이 실패한 날도 별도 작업 없이 채워진다 |
+| 2026-10-29 | 웹은 빌드 때 정적 생성하고 런타임 재검증을 하지 않음 (`cacheLife("max")`) | 데이터는 git 커밋으로만 바뀌고 커밋마다 재빌드되므로, 실행 중에 다시 읽을 이유가 없다 |
+| 2026-10-29 | 화면과 무관한 파일만 바뀐 커밋은 Vercel 빌드 생략 (`ignoreCommand`) | daily 봇이 매일 커밋해 매일 재빌드됐다. 직전 커밋이 아니라 마지막 성공 배포와 비교해, 여러 커밋을 한 번에 push해도 src 변경을 놓치지 않는다 |
 
 ---
 
@@ -292,7 +314,7 @@ exclude:
 
 - [ ] 프로젝트 이름
 - [ ] Tools 트랙 소스 목록 (REA 포함 여부 확인 -> REA 안 함.)
-- [ ] 사용할 모델과 API (M1에서 결정)
+- [x] 사용할 모델과 API: Anthropic API, 채점 Haiku 5.5 / 작성 Sonnet 5.5 (2026-10-28 결정)
 - [x] 공개 범위: 처음부터 공개 (2026-10-25 결정)
 
 ---
