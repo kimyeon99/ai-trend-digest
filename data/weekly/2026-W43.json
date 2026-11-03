@@ -8,72 +8,164 @@
     "collected": 260,
     "published": 5
   },
-  "headline": "에이전트 컨텍스트 관리 · KV 캐시 서빙 · 하니스 자기 개선 · RAG 구성 평가",
+  "headline": "에이전트 컨텍스트·캐시 관리 · 코딩 에이전트 하네스 개선 · RAG 조합 평가",
   "papers": [
     {
       "itemId": "hf-2610.18784",
       "title": "Pack Light, CarryOn: Building Object-Oriented Context for Long-Horizon Agents",
       "url": "https://huggingface.co/papers/2610.18784",
+      "oneliner": "긴 작업을 하는 에이전트가 지난 대화 기록 대신 재사용 가능한 작업 객체 중심으로 컨텍스트를 구성하는 방법을 제안한다.",
       "summary": [
-        "장기 과제 에이전트는 진행 상태를 쌓아 두면서도 그 진행이 어떻게 이루어졌는지 보여 주는 상호작용 기록을 반복해서 처리합니다.",
-        "CarryOn은 재사용 가능한 과제 객체를 중심으로 컨텍스트를 구성하며, 이어가기 담당 요소, 보완 실행 컨텍스트, 최근 상호작용의 라이브 꼬리로 컨텍스트 뷰를 만들고 폴드마다 근거와 환경 검사로 레코드를 갱신합니다.",
-        "OSWorld 2.0과 BrowseComp-Plus에서 각각 5.8%, 7.0%의 성능 향상을 보였고 전체 토큰 사용량은 51.9%, 22.9% 줄었습니다."
+        "장기 작업 에이전트는 진행 상황을 이미 저장해 두고도 그 과정을 설명한 긴 상호작용 기록을 계속 다시 처리한다.",
+        "CarryOn은 이어갈 작업 객체, 실행 맥락, 최근 상호작용을 조합해 컨텍스트를 만들고, 기록이 정리된 뒤에도 객체 기록을 증거와 환경 검사로 부분 갱신한다.",
+        "OSWorld 2.0과 BrowseComp-Plus에서 성능이 각각 5.8%, 7.0% 향상되고 전체 토큰 사용량은 51.9%, 22.9% 줄었다."
       ],
-      "practical": "장기 실행 코딩 에이전트나 도구 호출 에이전트의 메모리와 컨텍스트 압축 설계에 참고할 만하며, 토큰 비용 절감 측면에서도 실용적입니다.",
+      "practical": "에이전트의 메모리와 컨텍스트 압축을 설계할 때 대화 요약 대신 작업 상태 객체 중심으로 구성하는 아이디어를 참고할 수 있다.",
       "difficulty": 2,
-      "label": "메모리·컨텍스트"
+      "label": "메모리·컨텍스트",
+      "terms": [
+        {
+          "term": "장기 작업 에이전트",
+          "meaning": "수많은 단계에 걸쳐 도구를 쓰며 오래 이어지는 작업을 수행하는 LLM 에이전트를 말한다."
+        },
+        {
+          "term": "컨텍스트 런타임",
+          "meaning": "모델에 넣을 입력 문맥을 실행 중에 구성하고 갱신하는 실행 계층을 뜻한다."
+        },
+        {
+          "term": "토큰",
+          "meaning": "LLM이 텍스트를 처리하는 단위로, 사용량이 곧 비용과 지연에 연결된다."
+        }
+      ],
+      "abstract": "Long-horizon agents accumulate progress in persistent task state, yet repeatedly process interaction histories describing how that progress was achieved. This raises a natural question: can long-horizon context instead be organized around reusable progress rather than the history that produced it? In this paper, we introduce CarryOn, an object-oriented context runtime that organizes continuation around reusable task objects. Rather than treating compressed histories or reconstructed accounts of progress as the primary basis for continuation, CarryOn builds a context view from continuation carriers, complementary execution context, and a live tail of recent interactions. A core challenge is keeping this reusable basis valid after its surrounding history is retired: how can CarryOn update the basis without reconstructing the full representation at every fold? CarryOn maintains carrier records across folds, revising affected records against bound evidence and applicable environment checks while carrying forward unaffected records and jointly updating execution context. Experiments on OSWorld 2.0 and BrowseComp-Plus show improved gains of 5.8% and 7.0% while reducing total token usage by 51.9% and 22.9%, respectively. Project page: https://ethannju.github.io/carryon"
     },
     {
       "itemId": "hf-2610.28577",
       "title": "Cache Engineering for Agents",
       "url": "https://huggingface.co/papers/2610.28577",
+      "oneliner": "에이전트가 KV 캐시 일부를 직접 제외하거나 위치를 조정해 다시 계산하는 비용 없이 긴 작업 기록을 관리하게 하는 방법과 서빙 엔진을 소개한다.",
       "summary": [
-        "에이전트의 궤적이 길어지면 KV 캐시 I/O와 저장이 주된 비용이 되는데, 기존 컨텍스트 엔지니어링은 앞부분을 수정해 캐시를 무효화하고 재프리필 비용을 일으킵니다.",
-        "캐시 엔지니어링은 에이전트가 궤적 수정이나 재프리필 없이 drop으로 일부 캐시를 어텐션에서 제외하고 repos로 위치 인코딩을 조정하도록 하며, 이를 위해 기존 서빙 API와 호환되는 상태 비저장 인터페이스를 갖춘 AKV 서빙 엔진을 함께 설계했습니다.",
-        "도구 응답 롤링 드롭 정책은 임계값 기반 요약 대비 평균 점수가 1.7점 오르고 비용이 27.7% 줄었으며, AKV로 최대 1.2배 출력 처리량과 P95 지연 1.5배 개선을 얻었습니다."
+        "에이전트의 작업 기록이 길어지면 KV 캐시 입출력과 저장이 큰 비용이 되고, 기록을 요약하거나 잘라내면 이후 캐시가 무효화되어 재계산이 필요하다.",
+        "저자들은 기록을 바꾸지 않고 drop으로 특정 캐시를 어텐션에서 제외하고 repos로 위치 인코딩을 조정하는 캐시 엔지니어링을 제안하며, 이를 위해 기존 서빙 API와 호환되는 상태 관리형 AKV 서빙 엔진을 함께 설계했다.",
+        "도구 응답을 순차적으로 제외하는 정책은 요약 기반 방식보다 평균 점수가 1.7점 높고 비용이 27.7% 낮았으며, AKV로 처리량은 최대 1.2배, P95 지연은 1.5배 빨라졌다."
       ],
-      "practical": "에이전트를 서빙하는 추론 서버의 비용과 지연 시간을 줄이는 방법이자 컨텍스트 관리 전략을 다시 생각하게 하는 직접적인 참고 자료입니다.",
+      "practical": "에이전트 추론 서버의 비용과 지연을 줄이고 싶은 서빙 담당자에게 프리픽스 캐시 재사용의 한계와 해결 방향을 알려 주는 직접적인 참고 자료다.",
       "difficulty": 3,
-      "label": "서빙·효율"
+      "label": "서빙·효율",
+      "terms": [
+        {
+          "term": "KV 캐시",
+          "meaning": "LLM이 이전 토큰의 계산 결과를 저장해 두어 같은 계산을 반복하지 않게 하는 메모리다."
+        },
+        {
+          "term": "re-prefill",
+          "meaning": "캐시가 무효화되어 이미 처리한 입력 문맥을 처음부터 다시 계산하는 과정이다."
+        },
+        {
+          "term": "위치 인코딩",
+          "meaning": "모델이 각 토큰의 순서를 알 수 있도록 넣어 주는 위치 정보다."
+        },
+        {
+          "term": "프리픽스 매칭",
+          "meaning": "요청의 앞부분이 같은 토큰 열이면 저장된 캐시를 재사용하는 방식이다."
+        }
+      ],
+      "abstract": "Large Language Model (LLM) agents can handle increasingly complex tasks, navigating long trajectories of observations and actions. As these trajectories grow, key-value (KV) cache I/O and storage become the dominant cost. Trajectories can also exceed the LLM's maximum context length, requiring control over active cache growth. Prior work uses context engineering to reduce cache size by trimming or summarizing history. However, modifying the trajectory prefix invalidates subsequent cached states and triggers costly re-prefilling of retained context. Task accuracy can also suffer when too little context is retained to limit re-prefill costs. We propose cache engineering as a new scheme. It allows agents to directly control their active KV cache without modifying the trajectory or re-prefilling retained context. Specifically, agents can proactively use drop to exclude selected cache from future attention and repos to adjust retained keys' position encodings. We formalize these cache operations and identify history dependence as a serving challenge: identical token sequences can yield different cache states under different cache operation sequences, making prefix matching insufficient for correct cache reuse. Thus, we co-design the AKV serving engine. It provides a stateless interface compatible with existing serving APIs, while internally managing stateful cache reuse, eviction, and restoration. Experiments show that a tool-response rolling-drop cache policy improves average benchmark scores by 1.7 points and reduces average cost by 27.7%, compared with conventional threshold-triggered summarization. With AKV, it achieves up to 1.2x the output throughput and a 1.5x speedup in P95 request latency. Recursive self-improvement of cache policies further reduces cost by 7.1% over expert design. Our code is at https://github.com/thu-nics/AKV."
     },
     {
       "itemId": "hf-2610.22791",
       "title": "Self-Evolving Coding Agents via Harness-Policy Optimization",
       "url": "https://huggingface.co/papers/2610.22791",
+      "oneliner": "코딩 에이전트의 실행 틀인 하네스와 모델 정책을 번갈아 개선해 성능을 높이는 자기 개선 프레임워크를 제안한다.",
       "summary": [
-        "코딩 에이전트의 성능은 정책 모델과 하니스가 함께 결정하는데, 한쪽만 개선하면 최적이 되기 어렵습니다.",
-        "Self-HPO는 정책이 자신의 실패를 분석해 하니스 후보를 제안하는 단계와 선택된 하니스 아래에서 강화학습으로 정책을 갱신하는 단계를 번갈아 수행하며, 학습 중 드러난 어려운 과제를 다음 하니스 탐색 집합으로 씁니다.",
-        "세 코딩 벤치마크에서 하니스만 또는 정책만 개선한 기준선을 앞섰고 Qwen3.5-35B-A3B의 평균 해결률을 57.8%에서 64.8%로 높였습니다."
+        "코딩 에이전트의 성능은 정책 모델과 하네스에 함께 달려 있는데, 한쪽만 개선하면 다른 쪽의 약점에 맞지 않아 최적이 되지 못한다.",
+        "Self-HPO는 정책이 자신의 실패를 분석해 하네스 후보를 제안하고, 선택된 하네스 아래에서 강화학습으로 정책을 갱신하며, 어려운 과제를 다음 하네스 탐색에 쓰는 과정을 반복한다.",
+        "세 코딩 벤치마크에서 하네스만 또는 정책만 개선한 기준선보다 좋았고 Qwen3.5-35B-A3B의 평균 해결률이 57.8%에서 64.8%로 올랐다."
       ],
-      "practical": "코딩 에이전트의 하니스 설계와 학습 방식을 이해하는 데 도움이 되지만, 강화학습 학습 환경이 필요해 바로 적용하기는 어렵습니다.",
+      "practical": "코딩 에이전트 도구를 만들거나 튜닝할 때 프롬프트·도구 구성(하네스)과 모델 학습을 따로 보지 말고 함께 개선하라는 시사점을 준다.",
       "difficulty": 3,
-      "label": "코딩 도구"
+      "label": "코딩 도구",
+      "terms": [
+        {
+          "term": "하네스",
+          "meaning": "모델과 환경 사이에서 프롬프트, 도구, 실행 흐름을 맡는 에이전트의 실행 틀이다."
+        },
+        {
+          "term": "정책 모델",
+          "meaning": "에이전트가 다음에 어떤 행동을 할지 결정하는 LLM 자체를 말한다."
+        },
+        {
+          "term": "강화학습",
+          "meaning": "결과에 대한 보상을 통해 모델이 더 좋은 행동을 하도록 학습시키는 방법이다."
+        },
+        {
+          "term": "Pass@k",
+          "meaning": "k번 시도했을 때 한 번이라도 정답이 나오는 비율을 보는 지표다."
+        }
+      ],
+      "abstract": "Large language model (LLM) agents have shown promising potential in coding tasks, and their performance is jointly determined by the policy model and the harness that mediates their interaction with the environment. Indeed, harness and policy are mutually reinforcing and evolving only one component is suboptimal---a harness tuned for one checkpoint may not target the failure modes of an updated policy, while policy learning remains limited to the trajectories elicited by a fixed harness. In light of this, we propose Self-HPO, a recursive self-improving framework for coding agents that alternates harness and policy optimization, using the evolving policy as its own harness proposer. Specifically, in each round, the current policy first analyzes its own failures and proposes new harness candidates (H-step). The policy is then updated through reinforcement learning (RL) under the selected harness (P-step), and hard tasks identified during training form the next harness search set, keeping harness optimization targeted to the policy's evolving failure modes. Across three coding benchmarks, Self-HPO consistently outperforms harness-only and policy-only baselines, improving Qwen3.5-35B-A3B's average resolve rate from 57.8% to 64.8%, with gains generalizing to out-of-distribution settings. Further analysis shows that both optimized components retain gains even when paired with their base counterparts, while their joint gain exceeds the sum of their individual gains. Self-HPO also improves reliability (Pass@1) and expands the capability frontier (Pass@k) over the base agent. Additionally, we show that with a stronger external model (e.g., Opus 4.8) as the harness proposer, the same framework yields a further performance boost."
     },
     {
       "itemId": "hf-2610.29722",
       "title": "Retrieval Augmented Generation Compositionality",
       "url": "https://huggingface.co/papers/2610.29722",
+      "oneliner": "RAG의 여러 기법을 함께 쓸 때 개별 성능 향상이 그대로 합쳐지는지를 대규모 실험으로 검증한 연구다.",
       "summary": [
-        "RAG 파이프라인의 여러 기법이 보통 하나씩만 평가되어, 개별 이득이 조합해도 유지되는지 불분명합니다.",
-        "통제된 RAG 평가를 위한 오픈소스 프레임워크 LASAGNA를 만들고 여덟 개 벤치마크와 5K~200K 문서 규모의 코퍼스에서 450개 구성을 실험했습니다.",
-        "강한 기법들이 조합하면 기대한 +47% 대신 +17%만 나오고, 검색 품질과 충실도에 대한 이득이 다르게 쌓이며, 코퍼스가 커지면 최적 조합도 달라졌습니다."
+        "RAG 파이프라인의 기법들은 보통 하나씩만 평가되어, 조합했을 때도 효과가 유지되는지와 말뭉치 규모에 따른 차이가 불분명했다.",
+        "저자들은 통제된 RAG 평가용 오픈소스 프레임워크 LASAGNA를 만들어 8개 벤치마크와 5K~200K 문서 규모에서 450개 구성을 실험했다.",
+        "개별로 강한 기법이 조합에서는 기대만큼 합쳐지지 않았고, 검색 품질과 답변 충실도가 서로 상충할 수 있으며, 최적 조합은 말뭉치가 커지면 달라졌다."
       ],
-      "practical": "RAG 시스템을 구축할 때 기법을 하나씩 검증하지 말고 전체 스택과 실제 코퍼스 규모로 평가해야 한다는 실무적 근거를 제공합니다.",
+      "practical": "RAG 시스템에서 리랭커나 쿼리 확장 같은 기법을 도입할 때 단독 효과만 믿지 말고 실제 전체 구성과 데이터 규모에서 평가해야 한다는 근거가 된다.",
       "difficulty": 2,
-      "label": "RAG·검색"
+      "label": "RAG·검색",
+      "terms": [
+        {
+          "term": "청킹",
+          "meaning": "긴 문서를 검색하기 좋은 작은 조각으로 나누는 작업이다."
+        },
+        {
+          "term": "리랭킹",
+          "meaning": "1차 검색 결과를 더 정교한 모델로 다시 정렬해 관련도 높은 순으로 바꾸는 단계다."
+        },
+        {
+          "term": "컨텍스트 압축",
+          "meaning": "검색된 문서에서 핵심만 남겨 모델에 넣는 입력 길이를 줄이는 기법이다."
+        },
+        {
+          "term": "충실도",
+          "meaning": "생성된 답변이 검색된 근거 내용에 얼마나 충실한지를 뜻한다."
+        }
+      ],
+      "abstract": "Retrieval Augmented Generation (RAG) grounds large language models in external knowledge. Modern pipelines combine embedding, chunking, retrieval, reranking, query augmentation, context compression, and agentic verification, yet these techniques are typically evaluated one at a time. It remains unclear whether their isolated gains survive composition, whether retrieval quality and answer faithfulness favor the same design choices, and whether conclusions from small corpora hold at large scale. We pre-declare three hypotheses and introduce LASAGNA, an open-source framework for controlled RAG evaluation. We test 450 configurations across eight benchmarks and corpora ranging from 5K to 200K documents. Three findings emerge. First, individually strong techniques from different phases of a RAG pipeline do not necessarily compose: three retrieval techniques predict a +47% combined improvement but deliver only +17% when used together. Second, component gains stack differently for retrieval and faithfulness, and optimizing one can hurt the other. Third, the best composition changes as the corpus grows: the combination that wins on a small corpus may not remain best at large scale. These findings show that gains measured in isolation are not reliable predictors of realistic performance, and that new RAG techniques should be tested with the full surrounding stack. We call on researchers to do so and supply LASAGNA to simplify these experiments."
     },
     {
       "itemId": "hf-2610.26770",
       "title": "HarnessPro: Recursive Harness Self-Improvement with Pareto Optimization for Performance-Cost Trade-offs",
       "url": "https://huggingface.co/papers/2610.26770",
+      "oneliner": "코딩 에이전트의 하네스를 자동으로 개선하면서 성능과 실행 비용 사이에서 경량·균형·고성능 버전을 함께 제공하는 방법이다.",
       "summary": [
-        "하니스를 재귀적으로 자기 개선하는 방식은 성능이 오르는 대신 실행 비용도 함께 커지는 경향이 있습니다.",
-        "HarnessPro는 정답이나 공식 테스트 없이 LLM이 만든 테스트로 후보를 평가하고, 전문 에이전트들이 궤적을 진단해 성능과 비용 우선순위가 다른 업데이트를 만들며, 파레토 방식 선택으로 lite, medium, heavy 하니스를 제공합니다.",
-        "GPT-5.5와 Codex 조합에서 heavy 모드는 RHO 대비 평균 통과율이 2.0%p 오르고 과제당 비용이 26.1% 줄었으며 GLM-5.2와 Claude Code에서도 같은 경향이 유지되었습니다."
+        "하네스를 자기 개선으로 발전시키는 기존 방식은 성능이 오르는 대신 실행 비용도 커지는 경향이 있다.",
+        "HarnessPro는 정답이나 공식 테스트 없이 LLM이 만든 테스트로 후보를 평가하고, 전문 에이전트들이 실행 기록을 진단해 개선안을 만들며, 가중 거리 기준으로 lite, medium, heavy 하네스를 선택한다.",
+        "GPT-5.5와 Codex 조합에서 heavy 모드는 기존 RHO 대비 평균 통과율이 2.0%p 오르고 과제당 평균 비용이 26.1% 줄었으며 GLM-5.2와 Claude Code에서도 같은 경향을 보였다."
       ],
-      "practical": "Codex나 Claude Code 같은 코딩 에이전트 CLI를 예산에 맞게 튜닝하는 방법으로 직접 참고할 수 있습니다.",
+      "practical": "Codex나 Claude Code 같은 코딩 에이전트 환경을 팀 예산에 맞게 구성할 때 성능 대비 비용을 조절하는 설계 방식을 참고할 수 있다.",
       "difficulty": 2,
-      "label": "코딩 도구"
+      "label": "코딩 도구",
+      "terms": [
+        {
+          "term": "하네스",
+          "meaning": "모델과 환경 사이에서 프롬프트, 도구, 실행 흐름을 맡는 에이전트의 실행 틀이다."
+        },
+        {
+          "term": "파레토 최적화",
+          "meaning": "성능과 비용처럼 상충하는 목표 사이에서 어느 하나를 희생하지 않고는 더 나아질 수 없는 해들을 찾는 방식이다."
+        },
+        {
+          "term": "label-free",
+          "meaning": "정답 데이터나 공식 테스트 없이 학습이나 평가를 진행하는 방식을 뜻한다."
+        }
+      ],
+      "abstract": "Harness development plays a crucial role in building capable AI agents. Recent approaches improve harnesses through recursive self-improvement (RSI), but their performance gains often come with higher execution costs. We introduce HarnessPro, a label-free method for evolving harnesses to improve task performance while reducing execution cost. In this setting, candidate harnesses are evaluated using LLM-generated tests without access to ground-truth solutions or official tests. Specialized agents diagnose execution trajectories, plan updates with different performance-cost priorities, and implement them as candidate harnesses. Rather than returning a single harness, HarnessPro uses normalized weighted squared-distance selection to provide cost-focused (lite), balanced (medium), and performance-focused (heavy) harnesses for different deployment budgets. Selected harnesses enter the next iteration, where execution feedback guides further updates. Our experiments cover Terminal-Bench 2, SWE-Bench Pro, and ProgramBench, using GPT-5.5 with Codex and GLM-5.2 with Claude Code. Across these benchmarks using GPT-5.5 with Codex, the heavy mode of HarnessPro achieves an average pass-rate gain of 2.0 percentage points and an average per-task cost reduction of 26.1% relative to RHO. This advantage also holds when using GLM-5.2 with Claude Code. Code is available at https://github.com/pzs19/HarnessPro"
     }
   ]
 }
