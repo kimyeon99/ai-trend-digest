@@ -8,72 +8,160 @@
     "collected": 205,
     "published": 5
   },
-  "headline": "에이전트 서빙 스케줄링 · 에이전트 메모리의 순가치 · 코딩 에이전트 실전 검증 · 에이전트 평가 벤치마크",
+  "headline": "에이전트 서빙 스케줄링 · 에이전트 메모리 가치 · 로컬 모델 코딩 실무 · 에이전트 평가 벤치마크",
   "papers": [
     {
       "itemId": "hf-2610.37230",
       "title": "TAO: Tool-Aware Joint Scheduling for LLM-Based Agentic Serving",
       "url": "https://huggingface.co/papers/2610.37230",
+      "oneliner": "도구 호출 대기 시간까지 고려해 에이전트 요청을 GPU에 배치하는 서빙 스케줄러를 제안한 논문입니다.",
       "summary": [
-        "에이전트 서비스는 GPU 추론과 외부 도구 실행을 번갈아 수행하는데, 기존 시스템은 도구 반환 준비 상태를 고려하지 않고 휴리스틱으로 스케줄링해 자원을 낭비합니다.",
-        "TAO는 도구 준비 상태, 시간에 따라 감쇠하는 노드별 캐시 크레딧, 토큰 사용량을 묶은 가치 인터페이스를 만들고, 동적 계획법으로 대기 세션의 선택과 배치를 함께 결정합니다.",
-        "12개 설정에서 지표별 최고 기준선 대비 지연 시간을 최대 26.8%, 평균 TTFT를 최대 36.3% 줄이고 디코드 처리량을 최대 29.5% 높였습니다."
+        "에이전트 서비스는 GPU 추론과 CPU 외부 도구 실행을 번갈아 하는데, 기존 시스템은 도구 결과가 언제 준비되는지를 보지 않고 휴리스틱으로 배치해 자원을 낭비합니다.",
+        "TAO는 도구 준비 시점, 노드별 캐시 이점, 토큰 사용량을 합친 가치 값을 만들고, 동적 계획법으로 대기 세션의 선택과 배치를 함께 결정합니다.",
+        "12가지 모델·워크로드·동시성 설정에서 각 지표별 최고 기준선 대비 지연 시간은 최대 26.8%, 첫 토큰까지 평균 시간은 최대 36.3% 줄고 디코드 처리량은 최대 29.5% 늘었습니다."
       ],
-      "practical": "에이전트형 LLM 서비스를 직접 서빙할 때 도구 대기 시간과 캐시 재사용을 스케줄링에 반영하는 설계 아이디어로 바로 참고할 수 있습니다.",
+      "practical": "에이전트용 추론 서버를 직접 운영하거나 지연 시간과 비용을 튜닝할 때, 도구 대기와 캐시 재사용을 스케줄링에 반영하는 아이디어를 참고할 수 있습니다.",
       "difficulty": 3,
-      "label": "서빙·효율"
+      "label": "서빙·효율",
+      "terms": [
+        {
+          "term": "TTFT",
+          "meaning": "요청을 보낸 뒤 첫 번째 토큰이 나올 때까지 걸리는 시간입니다."
+        },
+        {
+          "term": "디코드 처리량",
+          "meaning": "모델이 토큰을 생성하는 단계에서 단위 시간당 만들어내는 토큰 수입니다."
+        },
+        {
+          "term": "동적 계획법",
+          "meaning": "큰 문제를 작은 부분 문제로 나눠 최적의 선택을 계산하는 알고리즘 기법입니다."
+        },
+        {
+          "term": "캐시 크레딧",
+          "meaning": "특정 노드에 이미 저장된 캐시를 재사용할 수 있을 때 얻는 이득을 수치로 표현한 값입니다."
+        }
+      ],
+      "abstract": "Agentic services alternate between model inference on clustered GPUs and external tools on distributed CPUs. In this scenario, existing systems (1) overlook tool-return readiness in service evaluation, wasting limited resources, and (2) use heuristic strategies to decide admission and placement on GPUs, resulting in suboptimal scheduling decisions. To bridge this gap, we present TAO, a tool-aware joint scheduling framework for LLM-based agentic serving. Its value interface combines near-term tool readiness, node-specific cache credit with time-aware decay, and token footprint; a dynamic program jointly selects and places waiting sessions under capacity constraints. Across the 12 reported model-workload-concurrency settings, TAO reduces latency by up to 26.8%, reduces mean time to first token (TTFT) by up to 36.3%, and increases decode throughput by up to 29.5% relative to the best evaluated state-of-the-art baseline for each metric."
     },
     {
       "itemId": "hf-2610.33106",
       "title": "VibeGame: Prompt-to-Game Development with AI-Native Engine and Self-Evolving Adversarial Agent Team",
       "url": "https://huggingface.co/papers/2610.33106",
+      "oneliner": "자연어 지시만으로 2D 게임 프로젝트 전체를 만들어 주는 멀티 에이전트 프레임워크를 소개한 논문입니다.",
       "summary": [
-        "자연어만으로 코드, 장면, 에셋, 물리 등을 조율해 완성된 게임을 만드는 일은 기존 에이전트 방식으로 어렵습니다.",
-        "스키마로 검증되는 구조화 텍스트와 프레임 동기 제어를 갖춘 AI 네이티브 엔진 위에, 구현과 리뷰를 분리한 8개 전문 에이전트 팀과 학습 없이 재사용 가능한 골격을 추출하는 자기 진화 방식을 설계했습니다.",
-        "GameCraft-Bench 일부에서 같은 모델을 쓴 여러 에이전트 하네스보다 P2G 설정에서 일관되게 더 좋은 성적을 냈습니다."
+        "게임 개발은 코드, 장면, 에셋, 애니메이션, 물리 설정을 함께 다뤄야 하고 통합 동작을 테스트해야 해서 LLM 에이전트로 끝까지 만들기 어렵습니다.",
+        "VibeGame은 프로젝트 상태를 스키마로 검증되는 구조화 텍스트로 표현하는 엔진과, 구현과 리뷰를 분리한 8개 전문 에이전트 팀을 쓰고, 완료된 프로젝트를 재사용 가능한 골격과 모듈로 정리해 다음 개발에 활용합니다.",
+        "GameCraft-Bench 일부에서 같은 기반 모델을 쓴 여러 에이전트 하네스보다 P2G 설정에서 꾸준히 더 좋은 성과를 냈습니다."
       ],
-      "practical": "게임 개발 자체는 업무와 거리가 있지만, 구조화 상태 노출과 구현·리뷰 분리라는 멀티 에이전트 구조는 코딩 에이전트 설계에 참고할 만합니다.",
+      "practical": "게임 자체는 관심 분야가 아니지만, 구현과 리뷰를 분리한 에이전트 팀과 구조화된 상태 인터페이스는 코딩 에이전트 설계에 참고할 만합니다.",
       "difficulty": 2,
-      "label": "멀티 에이전트"
+      "label": "멀티 에이전트",
+      "terms": [
+        {
+          "term": "하네스",
+          "meaning": "LLM을 감싸 도구 호출과 실행 흐름을 관리하는 에이전트 실행 틀입니다."
+        },
+        {
+          "term": "스키마 검증",
+          "meaning": "데이터가 미리 정한 구조와 형식에 맞는지 자동으로 확인하는 절차입니다."
+        },
+        {
+          "term": "프레임 동기 제어",
+          "meaning": "게임의 화면 갱신 단위에 맞춰 상태를 확인하고 행동을 실행하도록 제어하는 방식입니다."
+        }
+      ],
+      "abstract": "Large language model agents have enabled software development through natural-language interaction, but extending this paradigm to end-to-end game development remains challenging. Building a playable game requires coordinating code, scenes, assets, animations, physics, and configurations, while allowing developers to validate their integrated behavior through interactive testing. We introduce VibeGame, a framework for creating complete 2D game projects from natural-language prompts and optional reference images. Its AI-native game engine represents project state as schema-validated structured text and provides frame-synchronous runtime control, enabling agents to inspect game states, execute actions, and verify behavior at their own pace. Built upon this interface, we design an Adversarial Agent Team of eight specialized agents to separate implementation from review, so that problems are found and fixed through multi-round loops. For each conducted and accepted project, we further introduce a training-free self-evolution mechanism to distill it into reusable skeletons, modules, and collaboration contracts for future development. We evaluate prompt-assets-to-game (PA2G), where agents are given an asset library, and prompt-to-game (P2G), where agents generate their own art. On a GameCraft-Bench subset, VibeGame in P2G consistently outperforms a range of agent harnesses in either P2G or PA2G with the same underlying model, including GPT-6.1-Sol."
     },
     {
       "itemId": "hf-2610.34073",
       "title": "Memory Tax: Dissecting the Net Value of Agent Memory",
       "url": "https://huggingface.co/papers/2610.34073",
+      "oneliner": "에이전트용 메모리 시스템이 원본 기록을 그냥 검색하는 방식보다 실제로 이득인지 따져 본 논문입니다.",
       "summary": [
-        "장기 에이전트에 메모리 시스템을 쓰지만, 원본 기록을 그대로 검색하는 것보다 실제로 이득인지는 불분명합니다.",
-        "여러 벤치마크와 모델에서 메모리 시스템을 단순 RAG와 비교하고, 순가치를 메모리 이득과 메모리 세금(증거 손실·왜곡)으로 나누어 분석했습니다.",
-        "많은 전용 메모리 시스템이 여러 경우에서 단순 RAG보다 낮은 성능을 보여 순가치가 음수일 수 있음을 확인했습니다."
+        "장기 에이전트에 메모리를 쓰는 일이 늘고 있지만, 원본 기록을 직접 검색하는 것보다 메모리를 만드는 것이 순이익이 있는지는 불분명합니다.",
+        "여러 벤치마크와 모델에서 RAG를 기준으로 삼아, 메모리의 이득을 memory benefit, 손실을 memory tax로 나누어 분석하고 특히 손실이 생기는 원인을 시스템과 평가 측면에서 살펴봅니다.",
+        "많은 전용 메모리 시스템이 여러 경우에서 단순 RAG보다 성능이 낮아 순가치가 음수임을 보였습니다."
       ],
-      "practical": "에이전트에 메모리 계층을 넣기 전에 단순 RAG를 기준선으로 비교해 봐야 한다는 근거가 되어 설계 판단에 직접 도움이 됩니다.",
+      "practical": "에이전트에 메모리 계층을 붙이기 전에 단순 RAG를 기준선으로 먼저 비교해 봐야 한다는 점에서 설계 판단에 바로 도움이 됩니다.",
       "difficulty": 2,
-      "label": "메모리·컨텍스트"
+      "label": "메모리·컨텍스트",
+      "terms": [
+        {
+          "term": "RAG",
+          "meaning": "질문과 관련된 문서를 검색해 LLM 입력에 붙여 답하게 하는 방식입니다."
+        },
+        {
+          "term": "장기 에이전트",
+          "meaning": "긴 시간과 많은 단계에 걸쳐 작업하거나 대화하는 LLM 에이전트입니다."
+        },
+        {
+          "term": "백본 모델",
+          "meaning": "에이전트나 시스템의 핵심 추론을 담당하는 기반 LLM입니다."
+        }
+      ],
+      "abstract": "Memory is increasingly used in long-horizon agents, yet the net value of building memory over direct retrieval from raw history remains largely unclear. Through a large-scale evaluation across multiple benchmarks and model backbones, we find many dedicated memory systems underperform naive RAG in many cases, indicating a negative net value. Taking RAG as a reference, we dissect the net value of memory into the gains and losses over direct retrieval, termed memory benefit and memory tax. These gains and losses arise because memory process changes how the raw information is organized and accessed. We view such changes as the double-edged deviations from the raw history. They are originally designed and introduced to benefit the task, for example by reorganizing facts or distilling preferences, but some may also remove or obscure evidence, giving rise to memory tax. Since memory benefit reflects the expected gains of its design, we then focus more on the overlooked memory tax, study how it arises from the system and evaluation side, and generalize the concept to more application scenarios of memory. We hope the notion of memory tax can provide a new lens and shift more attention from standalone performance to the net value of memory, informing more reliable memory designs and evaluations. We will open-source the code and results to the community. Project Page: https://hexuan21.github.io/MemoryTax/"
     },
     {
       "itemId": "hf-2610.24520",
       "title": "HABIT-Bench: Evaluating Habit Induction from Longitudinal Weak Evidence in Agent Memory",
       "url": "https://huggingface.co/papers/2610.24520",
+      "oneliner": "에이전트 메모리가 사용자의 습관을 약한 단서에서 추론하고 활용하는지 평가하는 벤치마크입니다.",
       "summary": [
-        "장기 대화에서 사용자의 습관은 약한 단서로만 드러나서, 과거 기록을 보관하는 것만으로는 습관을 추론해 적절히 적용하기 어렵습니다.",
-        "합성 사용자 이력과 습관 그래프로 수백 세션 규모의 HABIT-Bench를 만들고, 임시 예외나 습관 변화 등을 포함한 4지선다 과제로 8가지 메모리 방법을 평가했습니다.",
-        "가장 좋은 방법도 4개 영역 평균 정확도가 33.61%에 그쳤고, 정답 증거를 직접 줘도 성능이 제한적이었습니다."
+        "사용자의 습관은 여러 대화에 흩어진 부분적 증거로만 드러나는데, 과거 기록을 보관하는 것만으로는 에이전트가 습관을 추론해 적절히 쓸 수 있는지 알 수 없습니다.",
+        "음식, 금융, 소프트웨어, 여행 분야의 수백 세션짜리 합성 사용자 기록을 만들고, 일시적 예외와 습관 변화 등을 포함한 4지선다 과제로 8가지 메모리 방법을 평가했습니다.",
+        "가장 좋은 방법도 4개 분야 평균 정확도가 33.61%에 그쳤고, 정답 증거를 직접 줘도 성능이 제한적이었습니다."
       ],
-      "practical": "개인화 에이전트의 메모리를 평가할 벤치마크가 필요할 때 참고할 수 있지만, 당장 제품에 적용할 기법은 아닙니다.",
+      "practical": "개인화 기능이 있는 에이전트의 메모리를 설계하거나 평가할 때 습관 변화와 예외를 테스트 케이스로 삼는 데 참고할 수 있습니다.",
       "difficulty": 2,
-      "label": "평가·벤치마크"
+      "label": "평가·벤치마크",
+      "terms": [
+        {
+          "term": "매크로 정확도",
+          "meaning": "각 분야별 정확도를 따로 구한 뒤 평균을 낸 값입니다."
+        },
+        {
+          "term": "합성 데이터",
+          "meaning": "실제 수집이 아니라 규칙이나 모델로 인위적으로 만든 데이터입니다."
+        },
+        {
+          "term": "약한 증거",
+          "meaning": "단독으로는 결론을 내리기 어려운 부분적인 단서입니다."
+        }
+      ],
+      "abstract": "In long-term interactions with large language model (LLM) agents, users reveal habits through their choices and actions. These habits capture implicit user information that agents must infer across conversations. However, individual observations may provide only partial evidence about a habit or when it applies. Retaining past interactions alone does not ensure that agents can infer habits and apply them appropriately. We introduce HABIT-Bench to evaluate how well agent memory systems infer habits from weak evidence and apply them to later requests. We construct synthetic user histories from task-oriented dialogue data and controlled habit graphs. The histories span hundreds of sessions across food, finance, software, and travel. Four-choice tasks assess agents' ability to infer user habits and apply them appropriately. They include temporary exceptions, changes in habits, and suggestions that users have not accepted. Sampled tasks undergo independent human review. We evaluate eight memory methods with Qwen3-235B-A22B and GLM-5.3-Flash. The best-performing memory method achieves 33.61\\% macro accuracy across the four domains. Performance remains limited even when annotated evidence is supplied directly. These results expose a persistent gap between access to past interactions and the ability to infer and appropriately use user habits."
     },
     {
       "itemId": "hf-2610.34241",
       "title": "Beyond Benchmarks: Can Small Open-Weight Models Get Real Coding Work Done?",
       "url": "https://huggingface.co/papers/2610.34241",
+      "oneliner": "작은 오픈웨이트 모델을 로컬에서 서빙해 실제 코딩 작업을 맡겨 본 경험을 정리한 보고서입니다.",
       "summary": [
-        "오픈 웨이트 모델이 텍스트를 생성하는 것과 실제 코딩 작업을 끝내는 것은 다르며, 호환 엔드포인트 뒤에서도 도구 호출 형식과 캐시 재사용 등이 달라집니다.",
-        "vLLM, SGLang, llama.cpp, MLX와 여러 코딩 클라이언트를 쓰며 4,165개 게이트웨이 턴과 세 가지 위임 실험을 숨겨진 행동 검사로 경험적으로 분석한 보고서입니다.",
-        "캐시 재사용이 높은 요청은 첫 토큰이 2.8초로 콜드 요청의 약 69.4초보다 훨씬 빨랐고, 소형 워커 위임은 직접 코딩보다 성공률과 검증된 성공당 비용 모두에서 불리했습니다."
+        "오픈웨이트 모델이 텍스트를 생성하는 것과 코딩 작업을 끝내는 것은 다르며, 호환 엔드포인트 뒤에서도 도구 호출 형식, 컨텍스트, 캐시 재사용, 안정성이 모델마다 달랐습니다.",
+        "vLLM, SGLang, llama.cpp, MLX와 여러 코딩 클라이언트를 사용해 자체 세션 기록과 디버그 작업, 숨겨진 행동 검사를 포함한 세 가지 위임 실험을 수행했습니다.",
+        "캐시 재사용이 높은 요청은 첫 토큰이 약 2.8초로 콜드 요청의 약 69.4초보다 훨씬 빨랐고, 비교한 두 연구에서 직접 코딩이 검증된 성공당 비용도 더 낮았습니다."
       ],
-      "practical": "코딩 에이전트에 로컬 오픈 모델을 붙여 서빙할 때 겪는 도구 호출 호환성, 캐시, 검증 문제를 미리 파악하는 데 매우 실용적입니다.",
+      "practical": "로컬 모델을 코딩 에이전트의 하위 작업자로 붙이려는 경우 도구 호출 호환성, 캐시 재사용, 결과 검증 체계를 어떻게 점검할지 실무 사례로 볼 수 있습니다.",
       "difficulty": 2,
-      "label": "코딩 도구"
+      "label": "코딩 도구",
+      "terms": [
+        {
+          "term": "오픈웨이트 모델",
+          "meaning": "학습된 가중치가 공개되어 직접 내려받아 실행할 수 있는 모델입니다."
+        },
+        {
+          "term": "vLLM",
+          "meaning": "LLM을 효율적으로 서빙하기 위한 오픈소스 추론 엔진입니다."
+        },
+        {
+          "term": "캐시 재사용",
+          "meaning": "이전 요청에서 계산한 프롬프트 처리 결과를 다시 활용해 속도를 높이는 방식입니다."
+        },
+        {
+          "term": "위임",
+          "meaning": "상위 모델이 하위 작업을 다른 모델 작업자에게 맡기는 구조입니다."
+        }
+      ],
+      "abstract": "Making an open-weight language model generate text is not the same as making it finish coding work. This retrospective empirical systems experience report follows my engineering work from July to October 2026 across coding clients, model-specific serving recipes, vLLM, SGLang, llama.cpp, and MLX. Models behind a nominally compatible endpoint still differed in tool-call formatting, turn control, context behavior, cache reuse, and reliability. A served model, coherent text, executed tool calls, and code that passes independent behavioral checks proved to be distinct levels of progress. The evidence includes 4,165 coding-agent gateway turns from my own sessions, 623 debug jobs, and three separate delegation studies with hidden behavioral checks and a fixed Claude Opus 5.5 parent. Saved cold-prefix requests had a median time to first token of about 69.4 s, versus 2.8 s for high-reuse requests (observational). In a 45-trial study, direct coding passed 15/15 and delegation to a quantized Qwen3-Coder 30B-A3B worker passed 12/15 and 14/15. On a second 15-task suite under a fixed artifact contract, the completed replacement cohort had 45/45 for direct coding and 12/45 for a Nemotron Cascade 2 worker (11 worker substitutions). Sixteen sessions stopped by a subscription limit before any model call were replaced; counting them as failures gives 37/45 and 8/45. A Qwen3-Coder worker passed 0/45. In both studies with a direct arm, direct coding had lower API list-price-equivalent frontier cost per verified success. A post-hoc diagnostic found that 19 of 36 artifacts rejected only for renamed parameters passed the hidden checks unchanged; they are not counted as successes. The contribution is an evidence-qualified account of serving, agent protocol, session continuity, artifact validation, and verification in practice. The studies are not pooled and do not rank models or runtimes."
     }
   ]
 }
