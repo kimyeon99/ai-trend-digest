@@ -8,7 +8,7 @@ export default async function Home() {
   const issue = latest ? await getIssue(latest) : null;
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-12 px-4 py-12">
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-12 px-4 py-12">
       {issue ? <IssueView issue={issue} /> : <p>아직 발행된 호가 없습니다.</p>}
 
       {past.length > 0 && (
