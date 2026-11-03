@@ -12,7 +12,7 @@ export default async function Home() {
       {issue ? <IssueView issue={issue} /> : <p>아직 발행된 호가 없습니다.</p>}
 
       {past.length > 0 && (
-        <nav className="flex flex-col gap-2">
+        <nav id="past" className="flex flex-col gap-2">
           <h2 className="text-lg font-semibold">지난 호</h2>
           <ul>
             {past.map((week) => (
