@@ -4,7 +4,7 @@ from datetime import date
 import pytest
 
 import publish_weekly
-from publish_weekly import PaperWriteup, Writeup
+from publish_weekly import PaperWriteup, Term, Writeup
 
 
 def make_item(item_id: str, upvotes: int, relevance: int = 50) -> dict:
@@ -23,16 +23,19 @@ def make_writeup(
     summary_lines: int = 3,
     difficulty: int = 2,
     topics: tuple[str, ...] = ("주제 1", "주제 2", "주제 3"),
+    term_count: int = 1,
 ) -> Writeup:
     return Writeup(
         topics=list(topics),
         papers=[
             PaperWriteup(
                 id=i,
+                oneliner=f"{i} 한 줄 설명",
                 summary=[f"{i} 요약 {n}" for n in range(summary_lines)],
                 practical=f"{i} 실무 연결",
                 difficulty=difficulty,
                 label="서빙·효율",
+                terms=[Term(term=f"용어 {n}", meaning=f"뜻 {n}") for n in range(term_count)],
             )
             for i in ids
         ],
@@ -104,10 +107,13 @@ def test_build_issue_follows_top_order_and_weekly_format():
         "itemId": "b",
         "title": "title b",
         "url": "https://example.com/b",
+        "oneliner": "b 한 줄 설명",
         "summary": ["b 요약 0", "b 요약 1", "b 요약 2"],
         "practical": "b 실무 연결",
         "difficulty": 2,
         "label": "서빙·효율",
+        "terms": [{"term": "용어 0", "meaning": "뜻 0"}],
+        "abstract": "abstract b",
     }
 
 
@@ -120,6 +126,7 @@ def test_build_issue_follows_top_order_and_weekly_format():
         make_writeup(["a", "b"], difficulty=4),
         make_writeup(["a", "b"], topics=("주제 1",)),
         make_writeup(["a", "b"], topics=("1", "2", "3", "4", "5")),
+        make_writeup(["a", "b"], term_count=5),
     ],
     ids=[
         "missing",
@@ -128,6 +135,7 @@ def test_build_issue_follows_top_order_and_weekly_format():
         "difficulty-out-of-range",
         "too-few-topics",
         "too-many-topics",
+        "too-many-terms",
     ],
 )
 def test_build_issue_rejects_invalid_writeup(writeup):

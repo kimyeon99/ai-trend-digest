@@ -34,17 +34,22 @@ Label = Literal[
     "학습·추론 방법",
 ]
 TOPICS_MIN, TOPICS_MAX = 2, 4
+TERMS_MAX = 4
 
 SYSTEM_PROMPT = """\
 You write a weekly Korean digest of AI papers for one reader, described by the profile.
 
 For each paper:
+- `oneliner`: one plain Korean sentence that says what the paper does, so a reader skimming a
+  list knows what it is about. No jargon.
 - `summary`: exactly three short Korean sentences: the problem, the method, the result.
 - `practical`: one Korean sentence on how it connects to the reader's work in the profile. If it
   has no practical use, say so plainly.
 - `difficulty`: 1 (readable without ML background), 2 (needs basic ML knowledge), 3 (needs
   specialist knowledge).
 - `label`: the one allowed label that best fits the paper's main contribution.
+- `terms`: up to 4 technical terms used in `summary` or `practical` that a backend developer
+  may not know, each with a one-sentence Korean `meaning`. Empty if there are none.
 
 Also write `topics`: this week's 3 or 4 main themes, each a short Korean noun phrase (at most
 15 characters). No sentences and no verbs.
@@ -53,12 +58,19 @@ Use only the title and abstract. Do not add numbers, names, or claims that are n
 abstract. Return exactly one entry for every paper id given."""
 
 
+class Term(BaseModel):
+    term: str
+    meaning: str
+
+
 class PaperWriteup(BaseModel):
     id: str
+    oneliner: str
     summary: list[str]
     practical: str
     difficulty: int
     label: Label
+    terms: list[Term]
 
 
 class Writeup(BaseModel):
@@ -140,7 +152,11 @@ def build_issue(week: str, collected: int, top: list[dict], writeup: Writeup) ->
     if returned != expected:
         raise ValueError(f"Writeup ids do not match items: expected {expected}, got {returned}")
     for paper in writeup.papers:
-        if len(paper.summary) != 3 or paper.difficulty not in (1, 2, 3):
+        if (
+            len(paper.summary) != 3
+            or paper.difficulty not in (1, 2, 3)
+            or len(paper.terms) > TERMS_MAX
+        ):
             raise ValueError(f"Invalid writeup for {paper.id}: {paper}")
     if not TOPICS_MIN <= len(writeup.topics) <= TOPICS_MAX:
         raise ValueError(f"Expected {TOPICS_MIN}-{TOPICS_MAX} topics, got {writeup.topics}")
@@ -157,10 +173,14 @@ def build_issue(week: str, collected: int, top: list[dict], writeup: Writeup) ->
                 "itemId": item["id"],
                 "title": item["title"],
                 "url": item["url"],
+                "oneliner": by_id[item["id"]].oneliner,
                 "summary": by_id[item["id"]].summary,
                 "practical": by_id[item["id"]].practical,
                 "difficulty": by_id[item["id"]].difficulty,
                 "label": by_id[item["id"]].label,
+                "terms": [term.model_dump() for term in by_id[item["id"]].terms],
+                # shown next to the writeup so a reader can check it against the source
+                "abstract": item["text"],
             }
             for item in top
         ],
