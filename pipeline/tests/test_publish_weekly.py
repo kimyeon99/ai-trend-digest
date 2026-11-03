@@ -18,15 +18,21 @@ def make_item(item_id: str, upvotes: int, relevance: int = 50) -> dict:
     }
 
 
-def make_writeup(ids: list[str], summary_lines: int = 3, difficulty: int = 2) -> Writeup:
+def make_writeup(
+    ids: list[str],
+    summary_lines: int = 3,
+    difficulty: int = 2,
+    topics: tuple[str, ...] = ("주제 1", "주제 2", "주제 3"),
+) -> Writeup:
     return Writeup(
-        headline="이번 주 요약",
+        topics=list(topics),
         papers=[
             PaperWriteup(
                 id=i,
                 summary=[f"{i} 요약 {n}" for n in range(summary_lines)],
                 practical=f"{i} 실무 연결",
                 difficulty=difficulty,
+                label="서빙·효율",
             )
             for i in ids
         ],
@@ -92,7 +98,7 @@ def test_build_issue_follows_top_order_and_weekly_format():
 
     assert issue["period"] == {"from": "2026-10-26", "to": "2026-11-01"}
     assert issue["stats"] == {"collected": 40, "published": 2}
-    assert issue["headline"] == "이번 주 요약"
+    assert issue["headline"] == "주제 1 · 주제 2 · 주제 3"
     assert [paper["itemId"] for paper in issue["papers"]] == ["b", "a"]
     assert issue["papers"][0] == {
         "itemId": "b",
@@ -101,6 +107,7 @@ def test_build_issue_follows_top_order_and_weekly_format():
         "summary": ["b 요약 0", "b 요약 1", "b 요약 2"],
         "practical": "b 실무 연결",
         "difficulty": 2,
+        "label": "서빙·효율",
     }
 
 
@@ -111,8 +118,17 @@ def test_build_issue_follows_top_order_and_weekly_format():
         make_writeup(["a", "b", "c"]),
         make_writeup(["a", "b"], summary_lines=2),
         make_writeup(["a", "b"], difficulty=4),
+        make_writeup(["a", "b"], topics=("주제 1",)),
+        make_writeup(["a", "b"], topics=("1", "2", "3", "4", "5")),
     ],
-    ids=["missing", "extra", "two-line-summary", "difficulty-out-of-range"],
+    ids=[
+        "missing",
+        "extra",
+        "two-line-summary",
+        "difficulty-out-of-range",
+        "too-few-topics",
+        "too-many-topics",
+    ],
 )
 def test_build_issue_rejects_invalid_writeup(writeup):
     top = [make_item("a", 1), make_item("b", 1)]

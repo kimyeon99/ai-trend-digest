@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-import { SpotlightCard } from "@/components/SpotlightCard";
 import type { Issue, Paper } from "@/lib/issues";
 
 const FEATURED_COUNT = 3;
@@ -30,7 +29,10 @@ export function IssueView({ issue }: { issue: Issue }) {
         <h2 className="text-sm font-semibold text-accent">이번 주 추천 논문</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {featured.map((paper, i) => (
-            <SpotlightCard key={paper.itemId} className={i === 0 ? "md:col-span-2 md:row-span-2" : ""}>
+            <div
+              key={paper.itemId}
+              className={`flex flex-col overflow-hidden rounded-2xl border border-border bg-card ${i === 0 ? "md:col-span-2 md:row-span-2" : ""}`}
+            >
               {i === 0 && (
                 <div className="relative aspect-[1200/648] border-b border-border dark:brightness-90">
                   <Image
@@ -43,7 +45,7 @@ export function IssueView({ issue }: { issue: Issue }) {
                 </div>
               )}
               <PaperBody paper={paper} rank={i + 1} large={i === 0} />
-            </SpotlightCard>
+            </div>
           ))}
         </div>
       </section>
@@ -66,19 +68,17 @@ export function IssueView({ issue }: { issue: Issue }) {
 
 function PaperBody({ paper, rank, large = false }: { paper: Paper; rank: number; large?: boolean }) {
   return (
-    <div className={`flex flex-col gap-3 ${large ? "p-6" : "p-5"}`}>
-      <p className="text-xs text-muted">
-        <span className="font-semibold text-accent">#{rank}</span> · 난이도 {"★".repeat(paper.difficulty)}
-        {"☆".repeat(3 - paper.difficulty)}
-      </p>
-      <a
-        href={paper.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`leading-snug font-semibold hover:text-accent ${large ? "text-xl" : "text-base"}`}
-      >
-        {paper.title} <span className="text-muted">↗</span>
-      </a>
+    <div className={`flex flex-1 flex-col gap-3 ${large ? "p-6" : "p-5"}`}>
+      <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+        {paper.label && (
+          <span className="rounded-full bg-accent/10 px-2.5 py-1 font-semibold text-accent">{paper.label}</span>
+        )}
+        <span>
+          #{rank} · 난이도 {"★".repeat(paper.difficulty)}
+          {"☆".repeat(3 - paper.difficulty)}
+        </span>
+      </div>
+      <h3 className={`leading-snug font-semibold ${large ? "text-xl" : "text-base"}`}>{paper.title}</h3>
       <ul className="flex list-disc flex-col gap-1 pl-5 text-sm leading-relaxed">
         {paper.summary.map((line) => (
           <li key={line}>{line}</li>
@@ -87,6 +87,14 @@ function PaperBody({ paper, rank, large = false }: { paper: Paper; rank: number;
       <p className="rounded-lg bg-accent/8 px-3 py-2 text-sm leading-relaxed">
         <span className="font-semibold text-accent">왜 중요한가</span> {paper.practical}
       </p>
+      <a
+        href={paper.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-auto self-end text-sm text-muted underline underline-offset-4 hover:text-foreground"
+      >
+        원문 보기 ↗
+      </a>
     </div>
   );
 }

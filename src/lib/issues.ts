@@ -13,6 +13,8 @@ export type Paper = {
   summary: string[];
   practical: string;
   difficulty: 1 | 2 | 3;
+  // Issues published before labels were added (2026-W43, W44 until re-run) have none
+  label?: string;
 };
 
 export type Issue = {

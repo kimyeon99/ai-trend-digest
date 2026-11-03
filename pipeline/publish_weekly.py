@@ -5,6 +5,7 @@ import math
 from collections.abc import Callable
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from typing import Literal
 
 import anthropic
 from pydantic import BaseModel
@@ -20,6 +21,20 @@ TOP_N = 5
 
 MODEL = "claude-sonnet-5-5"
 
+# A fixed list, so issues can later be filtered by label. Almost every paper is about agents,
+# so the labels name which part of the work it is about
+Label = Literal[
+    "코딩 도구",
+    "메모리·컨텍스트",
+    "RAG·검색",
+    "서빙·효율",
+    "평가·벤치마크",
+    "멀티 에이전트",
+    "LLM 제품화",
+    "학습·추론 방법",
+]
+TOPICS_MIN, TOPICS_MAX = 2, 4
+
 SYSTEM_PROMPT = """\
 You write a weekly Korean digest of AI papers for one reader, described by the profile.
 
@@ -29,8 +44,10 @@ For each paper:
   has no practical use, say so plainly.
 - `difficulty`: 1 (readable without ML background), 2 (needs basic ML knowledge), 3 (needs
   specialist knowledge).
+- `label`: the one allowed label that best fits the paper's main contribution.
 
-Also write `headline`: one Korean sentence on what this week's papers have in common.
+Also write `topics`: this week's 3 or 4 main themes, each a short Korean noun phrase (at most
+15 characters). No sentences and no verbs.
 
 Use only the title and abstract. Do not add numbers, names, or claims that are not in the
 abstract. Return exactly one entry for every paper id given."""
@@ -41,10 +58,11 @@ class PaperWriteup(BaseModel):
     summary: list[str]
     practical: str
     difficulty: int
+    label: Label
 
 
 class Writeup(BaseModel):
-    headline: str
+    topics: list[str]
     papers: list[PaperWriteup]
 
 
@@ -124,6 +142,8 @@ def build_issue(week: str, collected: int, top: list[dict], writeup: Writeup) ->
     for paper in writeup.papers:
         if len(paper.summary) != 3 or paper.difficulty not in (1, 2, 3):
             raise ValueError(f"Invalid writeup for {paper.id}: {paper}")
+    if not TOPICS_MIN <= len(writeup.topics) <= TOPICS_MAX:
+        raise ValueError(f"Expected {TOPICS_MIN}-{TOPICS_MAX} topics, got {writeup.topics}")
 
     by_id = {paper.id: paper for paper in writeup.papers}
     days = week_days(week)
@@ -131,7 +151,7 @@ def build_issue(week: str, collected: int, top: list[dict], writeup: Writeup) ->
         "week": week,
         "period": {"from": days[0].isoformat(), "to": days[-1].isoformat()},
         "stats": {"collected": collected, "published": len(top)},
-        "headline": writeup.headline,
+        "headline": " · ".join(writeup.topics),
         "papers": [
             {
                 "itemId": item["id"],
@@ -140,6 +160,7 @@ def build_issue(week: str, collected: int, top: list[dict], writeup: Writeup) ->
                 "summary": by_id[item["id"]].summary,
                 "practical": by_id[item["id"]].practical,
                 "difficulty": by_id[item["id"]].difficulty,
+                "label": by_id[item["id"]].label,
             }
             for item in top
         ],
