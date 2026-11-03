@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 // Runs before first paint so a dark-mode visitor never sees a light flash
 const themeScript = `try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`;
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children, modal }: LayoutProps<"/">) {
   return (
     // The script above changes the class before React hydrates
     <html
@@ -51,6 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </div>
         </header>
         {children}
+        {modal}
       </body>
     </html>
   );

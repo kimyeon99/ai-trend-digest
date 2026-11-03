@@ -10,11 +10,14 @@ export type Paper = {
   itemId: string;
   title: string;
   url: string;
+  oneliner: string;
+  // problem, method, result
   summary: string[];
   practical: string;
   difficulty: 1 | 2 | 3;
-  // Issues published before labels were added (2026-W43, W44 until re-run) have none
-  label?: string;
+  label: string;
+  terms: { term: string; meaning: string }[];
+  abstract: string;
 };
 
 export type Issue = {
@@ -45,4 +48,32 @@ export async function getIssue(week: string): Promise<Issue | null> {
   // Checking against the list also keeps arbitrary input out of the file path
   if (!(await listWeeks()).includes(week)) return null;
   return JSON.parse(await readFile(path.join(WEEKLY_DIR, `${week}.json`), "utf-8"));
+}
+
+/** The paper's part of the URL: its arXiv id ("hf-2610.37230" → "2610.37230"). */
+export function paperSlug(paper: Paper): string {
+  return paper.itemId.replace(/^hf-/, "");
+}
+
+// Hugging Face publishes a screenshot of each paper's first page under its arXiv id
+export function thumbnailUrl(paper: Paper): string {
+  return `https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/${paperSlug(paper)}.png`;
+}
+
+/** Returns null for a paper that is not in that week's issue. */
+export async function getPaper(week: string, slug: string): Promise<{ paper: Paper; rank: number } | null> {
+  const papers = (await getIssue(week))?.papers ?? [];
+  const index = papers.findIndex((paper) => paperSlug(paper) === slug);
+  return index === -1 ? null : { paper: papers[index], rank: index + 1 };
+}
+
+/** Every published paper, for generateStaticParams. */
+export async function listPaperParams(): Promise<{ week: string; paper: string }[]> {
+  const params = [];
+  for (const week of await listWeeks()) {
+    for (const paper of (await getIssue(week))!.papers) {
+      params.push({ week, paper: paperSlug(paper) });
+    }
+  }
+  return params;
 }

@@ -32,8 +32,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* The page behind an open modal should not scroll */
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
+  /* Wrap Korean at spaces, not in the middle of a word */
+  word-break: keep-all;
 }
