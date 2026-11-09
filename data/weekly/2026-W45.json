@@ -1,0 +1,167 @@
+{
+  "week": "2026-W45",
+  "period": {
+    "from": "2026-11-02",
+    "to": "2026-11-08"
+  },
+  "stats": {
+    "collected": 206,
+    "published": 5
+  },
+  "headline": "에이전트 학습 데이터 합성 · 멀티 에이전트 협업 구조 · 멀티홉 RAG 질의 분해 · 장기 작업 에이전트 하네스",
+  "papers": [
+    {
+      "itemId": "hf-2611.05036",
+      "title": "ToolSpace: Scaling Tool-Centric Environment Synthesis for Long-Horizon Agents",
+      "url": "https://huggingface.co/papers/2611.05036",
+      "oneliner": "실제 MCP 서비스의 실행 기록에서 도구 간 의존 관계를 뽑아, 에이전트 학습·평가용 환경과 과제를 자동으로 만드는 방법을 제안한 논문입니다.",
+      "summary": [
+        "기존의 환경 확장 방식은 데이터베이스를 먼저 만들고 도구를 나중에 파생시켜서, 도구 인터페이스가 실제와 다르고 실행으로 검증되지 않는 문제가 있었습니다.",
+        "ToolSpace는 순서를 뒤집어 실제 실행 기록에서 규칙 기반으로 도구 간 의존성을 추출해 그래프로 묶고, 상태를 고려한 랜덤 워크로 과제를 만든 뒤 처음부터 재실행에 성공한 샘플만 남깁니다.",
+        "이렇게 만든 더 어려운 벤치마크에서 최신 모델 7개의 점수가 최대 38.2점 떨어졌고, 일곱 개 장기 도구 사용 벤치마크에서 Qwen3.6-35B-A3B의 평균 점수를 23.0에서 41.0으로 올렸습니다."
+      ],
+      "practical": "MCP 도구를 붙인 에이전트를 만들 때 실제 호출 로그로 평가·학습용 시나리오를 자동 생성하는 아이디어를 참고할 수 있습니다.",
+      "difficulty": 2,
+      "label": "학습·추론 방법",
+      "terms": [
+        {
+          "term": "MCP",
+          "meaning": "LLM 에이전트가 외부 도구와 서비스를 표준 방식으로 호출하게 해 주는 프로토콜입니다."
+        },
+        {
+          "term": "실행 트레이스",
+          "meaning": "에이전트나 서비스가 실제로 수행한 호출과 결과를 순서대로 기록한 로그입니다."
+        },
+        {
+          "term": "롤백",
+          "meaning": "작업 중 상태를 이전 시점으로 되돌리는 동작입니다."
+        },
+        {
+          "term": "RL",
+          "meaning": "보상 신호를 바탕으로 모델이 더 나은 행동을 하도록 학습시키는 강화학습입니다."
+        }
+      ],
+      "abstract": "Large language models are deployed as long-horizon agents that compose diverse tools across MCP services into executable workflows. Existing MCP environment-scaling methods are data-centric: they first synthesize a database and scenario, then derive tools and tasks from them. As a result, tool interfaces may not match real ones, tool compositions are not grounded in execution, and tasks rarely span more than one environment. We propose ToolSpace, a tool-centric framework that reverses this order. ToolSpace mines data, state, and retry dependencies from adjacent calls in execution traces of real MCP services and open agent corpora, using deterministic rules rather than LLM judgment, and clusters the resulting weighted tool-composition graph into environments. Databases are synthesized only for state-mutating environments, while query and stateless tools replay recorded returns. ToolSpace then performs state-aware random walks with rollback and decompiles each chain into a natural-language task with assertion-based checks, keeping only samples that replay successfully from the initial state. Applied to AutomationBench and tau3-Bench Banking, the pipeline produces harder Pro versions on which 7 frontier models drop by up to 38.2 points. Across seven long-horizon tool-use benchmarks, ToolSpace raises Qwen3.6-35B-A3B from 23.0 to 41.0 average score (43.2 with RL) and GLM-5.2 from 44.6 to 56.6, on par with Claude Opus 5. Ablations show that execution-witnessed edges clearly outperform LLM-judged ones, and performance keeps improving with data and environment scale."
+    },
+    {
+      "itemId": "hf-2610.39813",
+      "title": "EvoTeam: Multi-Agent Collaboration via Evolving Teams",
+      "url": "https://huggingface.co/papers/2610.39813",
+      "oneliner": "여러 에이전트로 이뤄진 팀의 구성과 상호작용 규칙, 개별 스킬을 실행 경험으로 함께 진화시키는 멀티 에이전트 프레임워크입니다.",
+      "summary": [
+        "개별 에이전트만 개선해서는 팀 협업이 좋아지지 않고, 기존 협업 진화 방식은 고정된 구조와 맞지 않는 상호작용 규칙의 재사용 때문에 다양한 과제에 약했습니다.",
+        "EvoTeam은 재사용 가능한 팀 라이브러리를 두고 팀을 선택하거나 새로 만들며, 팀별 상호작용 규칙과 여러 팀이 공유하는 개별 스킬을 실행 경험으로 함께 진화시킵니다.",
+        "네 개의 벤치마크 실험에서 효과를 보였다고 보고하며, 코드도 공개했습니다."
+      ],
+      "practical": "멀티 에이전트 구조를 설계할 때 과제별로 팀 구성과 규칙을 달리 두고 경험을 쌓아 재사용하는 방식을 참고할 만합니다.",
+      "difficulty": 2,
+      "label": "멀티 에이전트",
+      "terms": [
+        {
+          "term": "멀티 에이전트 시스템",
+          "meaning": "역할이 다른 여러 LLM 에이전트가 협력해 하나의 문제를 푸는 구조입니다."
+        },
+        {
+          "term": "스킬",
+          "meaning": "에이전트가 특정 작업을 수행하기 위해 재사용하는 지침이나 절차입니다."
+        }
+      ],
+      "abstract": "LLM-based multi-agent systems (MAS) rely on collaboration among specialized agents to solve complex tasks. Existing methods improve MAS by refining the prompts, skills, and execution strategies of individual agents based on task feedback. However, improving individual agents does not necessarily lead to better team collaboration. Recent studies have therefore extended evolution to the collaboration level, using collective execution experience to adjust team organization, and inter-agent interactions. Nevertheless, evolving collaboration across heterogeneous tasks remains challenging, as existing approaches often constrain team reorganization within a shared structure and reuse interaction rules across incompatible team contexts. In this paper, we propose EvoTeam, a collaboration-centric evolution framework that jointly evolves team organization, interaction rules, and individual agent skills through execution experience. It maintains a library of reusable teams, selecting or creating agent teams and guiding collaboration through team-specific interaction rules. Collaboration experience accumulates within compatible team contexts, while individual skills remain reusable across teams. Experiments across four benchmarks demonstrate its effectiveness. Our code is available at https://github.com/DEEP-JLU/EvoTeam."
+    },
+    {
+      "itemId": "hf-2611.02074",
+      "title": "SWE-Trail: History-Guided Trajectory Collection for Coding Agent Training",
+      "url": "https://huggingface.co/papers/2611.02074",
+      "oneliner": "코딩 에이전트의 학습용 작업 기록을 모을 때 이전 기록을 활용해 수집 노력을 효율적으로 배분하는 방법을 제안한 논문입니다.",
+      "summary": [
+        "이슈마다 기록을 독립적으로 여러 번 뽑으면 뒤로 갈수록 중복이 늘고, 이전 기록을 조언으로 에이전트에게 보여주면 테스트 때 없는 조언에 의존하는 불일치가 생깁니다.",
+        "SWE-Trail은 이전 기록을 에이전트 컨텍스트 밖에 두고 추가 수집이 유용할 상태를 고른 뒤, 에이전트가 낸 후보 행동을 같은 체크포인트에서 잠깐 실행해 이어갈 경로를 정합니다.",
+        "124B 학생 모델에서 독립 샘플링보다 SWE-bench Multilingual은 2.33점, SWE-bench Pro는 1.60점 평균 해결률이 올랐고, 이전 기록을 쓰지 않으면 Multilingual 향상은 0.11점에 그쳤습니다."
+      ],
+      "practical": "코딩 에이전트를 직접 학습시키지 않으면 쓸 일은 적지만, 에이전트 실행 로그로 학습 데이터를 만드는 방식이 어떻게 발전하는지 이해하는 데 도움이 됩니다.",
+      "difficulty": 3,
+      "label": "코딩 도구",
+      "terms": [
+        {
+          "term": "트래젝토리",
+          "meaning": "에이전트가 문제를 푸는 동안 거친 탐색, 수정, 검증의 행동 기록 전체입니다."
+        },
+        {
+          "term": "후속 학습",
+          "meaning": "사전학습이 끝난 모델을 추가 데이터로 더 학습시키는 단계입니다."
+        },
+        {
+          "term": "롤아웃",
+          "meaning": "에이전트가 환경에서 한 번 작업을 끝까지 수행해 보는 실행입니다."
+        },
+        {
+          "term": "체크포인트",
+          "meaning": "작업 중 특정 시점의 상태를 저장해 둔 지점입니다."
+        }
+      ],
+      "abstract": "Coding agents solve repository issues through long sequences of exploration, editing, and validation. These trajectories are increasingly used as post-training data, so how they are collected shapes what the trained model learns. A common approach is to sample multiple trajectories independently for each issue and then select or curate them. However, as more trajectories are sampled independently, later trajectories become increasingly redundant, even though earlier trajectories could guide where subsequent collection effort should be spent. A natural way to use this history is to expose it to the coding agent as advice. But training on such trajectories can make the model rely on advice that is unavailable at test time, creating a train-test mismatch. Instead, we argue that history should guide where collection effort is spent, while the coding agent decides what to generate. We introduce SWE-Trail, a trajectory collector that uses earlier trajectories to guide subsequent collection while keeping that history outside the coding agent's context. During a new rollout, SWE-Trail uses history to identify a state where additional collection effort may be useful. There, the coding agent proposes candidate next actions from its ordinary context, and SWE-Trail briefly executes them from the same checkpoint to decide which route continues. We evaluate collection approaches by training student models on the trajectories they produce. For a 124B student initialized from Ling-3.0-flash-base, SWE-Trail improves mean resolution over independent sampling by 2.33 and 1.60 percentage points on SWE-bench Multilingual and SWE-bench Pro, respectively. Without history, the same pipeline produces more resolved trajectories than independent sampling, but improves by only 0.11 points on Multilingual. These results show the value of using history to guide collection without exposing it to the coding agent."
+    },
+    {
+      "itemId": "hf-2610.37826",
+      "title": "DeFT-RAG: Decomposing Multi-Hop Questions into Self-Contained Sub-Questions with Reusable Answers",
+      "url": "https://huggingface.co/papers/2610.37826",
+      "oneliner": "여러 문서를 건너뛰며 답해야 하는 질문을 독립적으로 이해되는 하위 질문으로 쪼개고, 답을 캐시로 재사용하는 RAG 방법입니다.",
+      "summary": [
+        "RAG는 중간 개체가 질문에 나오지 않는 멀티홉 질문에 약하고, 반복형 방식은 LLM에게 계획, 의존성 판단, 재작성, 상태 추적 등 너무 많은 일을 맡겨 정확도가 제한됩니다.",
+        "DeFT-RAG는 한 번에 개체 이름이 모두 들어간 하위 질문 하나만 생성하게 하고, 상태 추적은 규칙 기반 QA 표로, 예/아니오 판단은 미세조정한 경량 모델로 옮기며, 같은 의미의 하위 질문은 캐시된 답을 재사용합니다.",
+        "MuSiQue, 2WikiMultiHopQA, HotpotQA에서 13개 베이스라인 중 가장 높은 정확도를 보이면서 입력 토큰은 다른 반복형 방법보다 적었고, 캐시를 공유하면 하위 질문의 23.1%가 캐시로 답해져 정확도 저하 없이 LLM 호출이 12.9% 줄었습니다."
+      ],
+      "practical": "RAG 서비스에서 LLM 호출을 줄이고 비용을 낮추기 위해 하위 질문 답변을 의미 기반으로 캐싱하고 일부 판단을 경량 모델로 옮기는 설계를 참고할 수 있습니다.",
+      "difficulty": 2,
+      "label": "RAG·검색",
+      "terms": [
+        {
+          "term": "멀티홉 질문",
+          "meaning": "답을 얻으려면 여러 문서의 사실을 중간 개체를 거쳐 연결해야 하는 질문입니다."
+        },
+        {
+          "term": "그래프 기반 RAG",
+          "meaning": "문서 속 개체와 관계를 그래프로 만들어 검색에 활용하는 RAG 방식입니다."
+        },
+        {
+          "term": "QA 캐시",
+          "meaning": "이미 답한 하위 질문과 답의 쌍을 저장해 두고 같은 의미의 질문에 재사용하는 저장소입니다."
+        }
+      ],
+      "abstract": "Retrieval-augmented generation (RAG) lets a large language model (LLM) answer questions by retrieving relevant passages from a large corpus. However, RAG struggles with multi-hop questions, which require chaining facts spread across several documents through intermediate entities that the question never mentions. Graph-based RAG methods retrieve once from the entities a question names and so rarely recover the full evidence chain. Iterative RAG methods recover it step by step, but their accuracy is limited by the many tasks they ask the LLM to perform, such as planning the sub-questions, deciding their dependencies, rewriting them as answers arrive, and keeping track of what is known. We propose DeFT-RAG, a RAG framework built on three components. First, DeFT-RAG generates one self-contained sub-question at a time from the original question and the sub-questions answered so far with their answers (QA pairs). Each sub-question names every entity it asks about, which removes the need to plan, track dependencies or rewrite, and lets the LLM focus on a single fine-grained task at a time. Second, DeFT-RAG moves the remaining LLM work outside the LLM: rule-based updates to a QA table that keeps track of what is known, and yes/no decisions made by a fine-tuned lightweight decision model. Third, DeFT-RAG caches the QA pairs and reuses an answer when a later question asks a sub-question with the same meaning. On MuSiQue, 2WikiMultiHopQA and HotpotQA, DeFT-RAG achieves the best accuracy among thirteen baselines with both gpt-4o-mini and Qwen3.6 as the backbone, while giving the LLM fewer input tokens than any other iterative method. With a QA cache shared across 1,000 MuSiQue questions, 23.1% of sub-questions are answered from the cache, which reduces LLM calls by 12.9% without lowering accuracy."
+    },
+    {
+      "itemId": "hf-2611.03178",
+      "title": "CoworkOS:Scaling Agent Coworkers for Real-world Automation",
+      "url": "https://huggingface.co/papers/2611.03178",
+      "oneliner": "전략 결정은 모델이, 상태 관리는 런타임이 맡도록 나눠 긴 업무를 사람과 함께 처리하는 범용 에이전트 하네스를 소개한 논문입니다.",
+      "summary": [
+        "복잡한 업무를 높은 품질로 끝내면서 장시간 모니터링과 의사결정까지 이어가는 일은 아직 풀기 어려운 과제입니다.",
+        "CoworkOS는 모델이 행동, 위임, 수락을 정하고 런타임이 상태와 피드백을 유지하는 3계층 구조로, 하위 에이전트에게 동기 또는 비동기로 위임하며, 계층적 워크스페이스와 영속적 의미 메모리로 세션 간 연속성을 유지합니다.",
+        "12개 벤치마크와 6개 응용 범주에서 Codex, DeepSeek Harness 같은 최신 에이전트 앱과 견줄 만했고, 사례 연구에서 다섯 라운드 동안 Qwen3.6-35B-A3B의 여덟 벤치마크 평균 점수가 33.19에서 42.95로 올랐습니다."
+      ],
+      "practical": "에이전트의 메모리, 작업 위임, 중단 후 재개 구조를 설계할 때 모델과 런타임의 역할 분리 방식을 참고할 수 있습니다.",
+      "difficulty": 2,
+      "label": "멀티 에이전트",
+      "terms": [
+        {
+          "term": "하네스",
+          "meaning": "모델을 감싸 도구 호출, 상태 관리, 피드백 루프를 제공하는 실행 틀입니다."
+        },
+        {
+          "term": "서브에이전트",
+          "meaning": "주 에이전트가 일부 작업을 넘겨 처리하게 하는 하위 에이전트입니다."
+        },
+        {
+          "term": "영속적 의미 메모리",
+          "meaning": "세션이 끝나도 남아 의미 기반으로 다시 불러 쓸 수 있는 장기 기억입니다."
+        },
+        {
+          "term": "RSI",
+          "meaning": "시스템이 스스로를 반복적으로 개선해 나가는 재귀적 자기 개선을 뜻합니다."
+        }
+      ],
+      "abstract": "Rapid advances in cowork agents are shifting human-AI collaboration toward real-world automation, delivering software, designs, and other artifacts. However, such productivity work demands both high-quality delivery on complex productivity tasks and continued monitoring and decision-making over long horizons, a combination that remains an open challenge. We introduce CoworkOS, a general-purpose harness for long-horizon work that separates task strategy from execution management: the model decides actions, delegation, and acceptance, while the runtime maintains state and feedback. Its three-layer architecture enables direct execution or delegation to Subagents, synchronously or asynchronously, under stable responsibilities. Through a shared application layer, humans and agents inspect and revise the same evolving documents, presentations, CAD models, and Blender scenes, so human-in-the-loop participation can enter both through conversation and through direct modification of the work itself. To sustain continuity across agents and sessions, CoworkOS further introduces hierarchical workspaces and persistent semantic memory, so working files, key decisions, and long-running Job logs remain shareable, reusable, and resumable after interruption. Across 12 benchmarks and 6 categories of real-world applications, CoworkOS proves highly competitive with frontier agent applications such as Codex and DeepSeek Harness. As a sustained-work case study, CoworkOS uses GLM-5.3 as its backbone to conduct RSI-driven automated post-training on Qwen3.6-35B-A3B. Over five rounds, the model's average score across eight benchmarks rose from 33.19 to 42.95 (+9.76). Looking ahead, we believe CoworkOS opens a meaningful path toward general cowork-agent intelligence."
+    }
+  ]
+}
