@@ -14,7 +14,7 @@ def make_item(item_id: str, upvotes: int, relevance: int = 50) -> dict:
         "url": f"https://example.com/{item_id}",
         "text": f"abstract {item_id}",
         "signals": {"upvotes": upvotes},
-        "score": {"relevance": relevance, "reason": ""},
+        "score": {"relevance": relevance, "reason": f"이유 {item_id}"},
     }
 
 
@@ -95,7 +95,7 @@ def test_gather_refreshes_and_scores_every_day(tmp_path):
 
 
 def test_build_issue_follows_top_order_and_weekly_format():
-    top = [make_item("b", 9), make_item("a", 1)]
+    top = publish_weekly.rank([make_item("b", 9), make_item("a", 1)])
 
     issue = publish_weekly.build_issue("2026-W44", 40, top, make_writeup(["a", "b"]))
 
@@ -114,6 +114,8 @@ def test_build_issue_follows_top_order_and_weekly_format():
         "label": "서빙·효율",
         "terms": [{"term": "용어 0", "meaning": "뜻 0"}],
         "abstract": "abstract b",
+        # 0.7*50 + 0.3*100 (b has the most upvotes)
+        "selection": {"final": 65.0, "relevance": 50, "upvotes": 9, "reason": "이유 b"},
     }
 
 
@@ -139,7 +141,7 @@ def test_build_issue_follows_top_order_and_weekly_format():
     ],
 )
 def test_build_issue_rejects_invalid_writeup(writeup):
-    top = [make_item("a", 1), make_item("b", 1)]
+    top = publish_weekly.rank([make_item("a", 1), make_item("b", 1)])
 
     with pytest.raises(ValueError):
         publish_weekly.build_issue("2026-W44", 2, top, writeup)

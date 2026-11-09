@@ -145,6 +145,16 @@ def request_writeup(prompt: str) -> Writeup:
     return response.parsed_output
 
 
+def selection(item: dict) -> dict:
+    """Why the paper was picked, from a ranked item (see rank)."""
+    return {
+        "final": item["final"],
+        "relevance": item["score"]["relevance"],
+        "upvotes": item["signals"]["upvotes"],
+        "reason": item["score"]["reason"],
+    }
+
+
 def build_issue(week: str, collected: int, top: list[dict], writeup: Writeup) -> dict:
     """Combine the selected items with the writeup. Fails unless each item got one valid entry."""
     expected = sorted(item["id"] for item in top)
@@ -181,6 +191,7 @@ def build_issue(week: str, collected: int, top: list[dict], writeup: Writeup) ->
                 "terms": [term.model_dump() for term in by_id[item["id"]].terms],
                 # shown next to the writeup so a reader can check it against the source
                 "abstract": item["text"],
+                "selection": selection(item),
             }
             for item in top
         ],

@@ -37,6 +37,15 @@ export function PaperDetail({ paper, rank }: { paper: Paper; rank: number }) {
         <p className="leading-relaxed">{paper.practical}</p>
       </section>
 
+      <section className="flex flex-col gap-1">
+        <h2 className="text-sm font-semibold text-muted">왜 골랐나</h2>
+        <p className="leading-relaxed">{paper.selection.reason}</p>
+        <p className="text-sm text-muted">
+          최종 {paper.selection.final}점 = 관련도 {paper.selection.relevance} × 0.7 + 추천 {paper.selection.upvotes}
+          개(주간 최댓값 기준 환산) × 0.3
+        </p>
+      </section>
+
       {paper.terms.length > 0 && (
         <section className="flex flex-col gap-2">
           <h2 className="text-sm font-semibold text-muted">용어 풀이</h2>

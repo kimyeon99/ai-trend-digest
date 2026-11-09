@@ -18,6 +18,8 @@ export type Paper = {
   label: string;
   terms: { term: string; meaning: string }[];
   abstract: string;
+  // final = 0.7 * relevance (LLM, 0-100) + 0.3 * upvotes (log-normalized within the week)
+  selection: { final: number; relevance: number; upvotes: number; reason: string };
 };
 
 export type Issue = {

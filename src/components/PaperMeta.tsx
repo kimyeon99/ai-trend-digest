@@ -8,6 +8,9 @@ export function PaperMeta({ paper, rank }: { paper: Paper; rank: number }) {
         #{rank} · 난이도 {"★".repeat(paper.difficulty)}
         {"☆".repeat(3 - paper.difficulty)}
       </span>
+      <span>
+        관련도 {paper.selection.relevance} · 추천 {paper.selection.upvotes}
+      </span>
     </div>
   );
 }
