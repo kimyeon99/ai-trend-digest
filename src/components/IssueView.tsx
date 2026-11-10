@@ -1,21 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { IssuePicker } from "@/components/IssuePicker";
 import { PaperMeta } from "@/components/PaperMeta";
 import { type Issue, type Paper, paperSlug, thumbnailUrl } from "@/lib/issues";
 
 const FEATURED_COUNT = 3;
 
-export function IssueView({ issue }: { issue: Issue }) {
+export function IssueView({ issue, issues }: { issue: Issue; issues: { week: string; label: string }[] }) {
   const featured = issue.papers.slice(0, FEATURED_COUNT);
   const rest = issue.papers.slice(FEATURED_COUNT);
 
   return (
     <article className="flex flex-col gap-12">
       <header className="flex flex-col gap-3">
-        <p className="text-sm text-muted">
-          {issue.week} · {issue.period.from} ~ {issue.period.to}
-        </p>
+        <div>
+          <IssuePicker issues={issues} current={issue.week} />
+        </div>
         <h1 className="text-2xl leading-snug font-bold md:text-3xl">{issue.headline}</h1>
         <p className="text-sm text-muted">
           수집 {issue.stats.collected}건 → 게재 {issue.stats.published}건

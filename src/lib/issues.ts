@@ -52,6 +52,29 @@ export async function getIssue(week: string): Promise<Issue | null> {
   return JSON.parse(await readFile(path.join(WEEKLY_DIR, `${week}.json`), "utf-8"));
 }
 
+/** Every published week with its label, newest first (for the issue pickers). */
+export async function listIssueSummaries(): Promise<{ week: string; label: string; month: string }[]> {
+  const issues = await Promise.all((await listWeeks()).map(getIssue));
+  return issues.filter((issue) => issue !== null).map((issue) => ({
+    week: issue.week,
+    label: weekLabel(issue),
+    month: issueMonth(issue),
+  }));
+}
+
+/** "2026-W44 · 10/26 ~ 11/01" */
+export function weekLabel(issue: Issue): string {
+  const day = (date: string) => date.slice(5).replace("-", "/");
+  return `${issue.week} · ${day(issue.period.from)} ~ ${day(issue.period.to)}`;
+}
+
+// An ISO week belongs to the month of its Thursday (Monday + 3 days)
+function issueMonth(issue: Issue): string {
+  const thursday = new Date(`${issue.period.from}T00:00:00Z`);
+  thursday.setUTCDate(thursday.getUTCDate() + 3);
+  return `${thursday.getUTCFullYear()}년 ${thursday.getUTCMonth() + 1}월`;
+}
+
 /** The paper's part of the URL: its arXiv id ("hf-2610.37230" → "2610.37230"). */
 export function paperSlug(paper: Paper): string {
   return paper.itemId.replace(/^hf-/, "");

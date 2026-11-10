@@ -46,6 +46,8 @@ export default function RootLayout({ children, modal }: LayoutProps<"/">) {
               <Link href="/#past" className="text-muted hover:text-foreground">
                 지난 호
               </Link>
+              {/* Separates the page links from the display setting */}
+              <span className="h-4 w-px bg-border" aria-hidden="true" />
               <ThemeToggle />
             </nav>
           </div>
