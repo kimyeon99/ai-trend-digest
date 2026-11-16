@@ -1,0 +1,201 @@
+{
+  "week": "2026-W46",
+  "period": {
+    "from": "2026-11-09",
+    "to": "2026-11-15"
+  },
+  "stats": {
+    "collected": 167,
+    "published": 5
+  },
+  "headline": "에이전트 메모리 검증 · 에이전트 비용 절감 · 에이전트 추론 서빙 · 결정 모델 활용",
+  "papers": [
+    {
+      "itemId": "hf-2611.14320",
+      "title": "Don't Just Trust Your Memory: Evidence-Linked Memory Reduces Memory-Induced Degradation in LLM Agents",
+      "url": "https://huggingface.co/papers/2611.14320",
+      "oneliner": "에이전트가 과거 경험에서 얻은 교훈을 원본 기록과 연결해 두어, 잘못된 교훈을 따라 실패하는 일을 줄이는 메모리 시스템을 제안한다.",
+      "summary": [
+        "외부 메모리의 교훈이 틀렸거나 잘못 적용되면, 메모리 없이도 풀 수 있던 과제를 오히려 실패하는 문제가 생긴다.",
+        "WikiTrace는 각 교훈을 성공·실패 이유 요약과 원본 기록에 연결해 저장하고, 필요할 때 링크를 따라 내려가 세부 내용을 채우거나 교훈을 바로잡는다.",
+        "다섯 가지 에이전트 벤치마크에서 기존 메모리 방식과 같은 교훈만 준 기준선보다 꾸준히 좋았고, 메모리로 인한 성능 저하도 줄었다."
+      ],
+      "practical": "코딩 에이전트나 멀티 에이전트에 메모리를 붙일 때, 교훈만 저장하지 않고 근거가 된 실행 기록을 함께 연결해 두는 설계로 바로 참고할 수 있다.",
+      "difficulty": 2,
+      "label": "메모리·컨텍스트",
+      "terms": [
+        {
+          "term": "trajectory",
+          "meaning": "에이전트가 과제를 수행하며 거친 행동과 관찰의 전체 기록이다."
+        },
+        {
+          "term": "메모리 유발 성능 저하",
+          "meaning": "메모리가 없었다면 풀었을 과제를 메모리 때문에 실패하게 되는 현상이다."
+        },
+        {
+          "term": "에이전트 벤치마크",
+          "meaning": "에이전트가 여러 단계에 걸쳐 과제를 해결하는 능력을 재는 표준 평가 세트이다."
+        }
+      ],
+      "abstract": "External memory enables LLM agents to improve from experience by distilling trajectories of past tasks into concise lessons for new tasks. However, memory can also lead to memory-induced degradation, where an agent fails on tasks it would solve without memory, often because it follows a lesson that is incorrect, or misapplies or misreads a valid one. This is because lessons are inferred from trajectories labeled only with task success or failure, yet are typically provided without the trajectories they came from, leaving the agent no way to check them. To address this, we introduce WikiTrace, an evidence-linked memory system designed to let agents check each lesson against its original trajectory. Specifically, motivated by the finding that a trajectory often still holds the evidence needed to catch an erroneous lesson, WikiTrace stores each lesson as a concise insight linked to a summary of why its trajectory succeeded or failed and to the raw trajectory itself. Then, on a new task, the agent starts from all insights and, whenever one lacks details needed to act, conflicts with another, or comes from a failed task, descends through its links with terminal tools to fill in missing details or correct the insight before acting. We validate WikiTrace on five agentic benchmarks, showing that it consistently outperforms existing memory approaches and a baseline given the same insights alone, while also reducing memory-induced degradation. Our code is available at https://github.com/yukyeongleee/wikitrace",
+      "selection": {
+        "final": 87.4,
+        "relevance": 88,
+        "upvotes": 68,
+        "reason": "LLM 에이전트 메모리 설계로 ai_agent의 메모리 항목에 직접 해당한다."
+      }
+    },
+    {
+      "itemId": "hf-2610.42148",
+      "title": "Flide: Accelerating Decision Inference with Exact State Forking",
+      "url": "https://huggingface.co/papers/2610.42148",
+      "oneliner": "에이전트가 쓰는 결정 모델의 여러 갈래 질의를 한 번에 정확하고 빠르게 처리하는 추론 엔진을 만들었다.",
+      "summary": [
+        "기존 추론 엔진은 결정 요청에서 앞부분 계산을 반복하거나 출력 확률이 왜곡되는 문제가 있다.",
+        "Flide는 요청의 트리 구조를 하나의 평탄한 토큰 스트림으로 실행하고, ForkAttention으로 GPU 인덱스를 따라 각 분기를 독립 실행과 동일하게 계산한다.",
+        "공개된 하이브리드 및 결정 모델에서 vLLM과 SGLang보다 최대 9.5배 빠르게 답하면서 float32 기준과의 오차도 가장 작았다."
+      ],
+      "practical": "분류나 선택형 판단을 LLM으로 대량 처리하는 추론 서버를 운영한다면, 공통 접두사 재계산을 줄이는 방식의 참고 사례가 된다.",
+      "difficulty": 3,
+      "label": "서빙·효율",
+      "terms": [
+        {
+          "term": "prefix recomputation",
+          "meaning": "여러 요청이 공유하는 앞부분 입력을 매번 다시 계산하는 낭비를 말한다."
+        },
+        {
+          "term": "ForkAttention",
+          "meaning": "하나의 토큰 스트림 안에서 분기별로 볼 수 있는 범위를 나눠 어텐션을 계산하는 기법이다."
+        },
+        {
+          "term": "Gated DeltaNet",
+          "meaning": "어텐션 대신 상태를 순차적으로 갱신하는 순환 방식의 신경망 층이다."
+        },
+        {
+          "term": "total variation distance",
+          "meaning": "두 확률 분포가 얼마나 다른지를 재는 거리 척도이다."
+        }
+      ],
+      "abstract": "Decision models such as Jev have emerged as a highly promising paradigm for LLM agent systems, providing lightweight and reliable categorical reasoning for rapid System One execution. However, existing generation-oriented inference engines fail to support these workloads effectively, suffering from severe prefix recomputation overheads or distorted output probabilities. To address this challenge, we propose Flide, an efficient and exact inference engine that decouples the logical tree structure of a decision request from its physical execution within a single flattened token stream. Through ForkAttention, Flide navigates request dependencies using GPU-resident indices across both standard attention and recurrent Gated DeltaNet layers, guaranteeing in exact arithmetic that every query branch evaluates identically to an isolated forward pass. By expressing branch topologies directly in GPU-resident metadata, Flide accommodates diverse request mixtures with a compact set of pre-recorded execution graphs while enabling expanding agent histories to resume from checkpoints saved in earlier passes. Extensive evaluations on public hybrid and decision models demonstrate that Flide answers queries up to 9.5 times faster than vLLM and SGLang while staying closest to a float32 reference in total variation distance. By unifying physical execution throughput with mathematical exactness, Flide establishes a principled foundation for scalable, latency-critical decision intelligence in agent systems.",
+      "selection": {
+        "final": 79.4,
+        "relevance": 82,
+        "upvotes": 36,
+        "reason": "LLM 에이전트의 결정 모델 추론을 가속하는 엔진으로 LLM 서빙·지연 시간 interests에 직접 맞는다."
+      }
+    },
+    {
+      "itemId": "hf-2610.35959",
+      "title": "AgentBaton: Efficient Model Collaboration in Agentic Tasks",
+      "url": "https://huggingface.co/papers/2610.35959",
+      "oneliner": "에이전트가 작업 도중 비싼 모델에서 저렴한 모델로 한 번 넘겨 비용을 크게 줄이는 방법을 연구했다.",
+      "summary": [
+        "긴 에이전트 작업은 비싼 모델에 의존하는데, 한 작업 안에서 비싼 모델과 저렴한 모델을 함께 쓰는 방법은 잘 탐구되지 않았다.",
+        "모델 교체 방향과 컨텍스트 전달 방식을 분석한 결과 적절한 시점에 비싼 모델에서 저렴한 모델로 한 번 넘기는 것이 효과적이었고, 이를 바탕으로 넘길 시점을 학습하는 가벼운 탐지기 AgentBaton을 만들었다.",
+        "11개 모델 쌍과 두 벤치마크에서 API 비용을 평균 65.9% 줄이면서 정확도는 대체로 유지했고, 최대 8.8%p 향상도 있었다."
+      ],
+      "practical": "코딩 에이전트나 LLM 제품의 API 비용을 줄이고 싶을 때, 초반에는 고성능 모델로 시작해 중간에 저가 모델로 넘기는 단순한 전략을 바로 시험해 볼 수 있다.",
+      "difficulty": 2,
+      "label": "서빙·효율",
+      "terms": [
+        {
+          "term": "handoff",
+          "meaning": "작업 도중 한 모델이 다른 모델에게 이어서 수행하도록 넘기는 것이다."
+        },
+        {
+          "term": "query-level routing",
+          "meaning": "요청 하나하나를 어떤 모델이 처리할지 요청 단위로 배정하는 방식이다."
+        },
+        {
+          "term": "Pareto frontier",
+          "meaning": "정확도와 비용처럼 상충하는 두 지표에서 더 나은 절충점들이 이루는 경계이다."
+        }
+      ],
+      "abstract": "Solving long-horizon agentic tasks requires language agents to interact with their environments over multiple steps, and reliable performance often comes from the expensive capable models available through cloud providers. Meanwhile, alternative efficient models with inferior performance but a much lower cost are emerging, including lower-tier cloud models and smaller open-weights models deployable on local hardware. This raises a natural question that remains less explored than traditional query-level routing: can capable and efficient models collaborate within a single long-horizon agentic task to substantially reduce cost while preserving task accuracy? In this paper, we systematically investigate key design choices for such collaboration through model handoffs, where one model takes over from another, focusing on handoff direction and context transfer. We find that efficient-to-capable handoffs generally underperform capable-only execution with limited or even no cost reduction, whereas capable-to-efficient handoffs at suitable stages of task progress largely preserve or even improve accuracy while substantially reducing cost. These findings suggest that a one-time, simple, well-timed handoff strategy is good enough for cost-effective agent collaboration, motivating AgentBaton, a lightweight detector that learns when to hand off from recurring patterns in task progress. Across 11 model pairs and two representative benchmarks, AgentBaton reduces API costs by 65.9% on average while largely preserving task accuracy, with accuracy gains of up to 8.8 percentage points over capable-only execution. Experiments across various reasoning-effort settings further show that AgentBaton extends the empirical accuracy-cost Pareto frontier.",
+      "selection": {
+        "final": 78.6,
+        "relevance": 85,
+        "upvotes": 22,
+        "reason": "에이전트 작업에서 모델 핸드오프로 비용을 줄이는 방식으로 LLM 에이전트 설계와 비용 관심사에 직접 부합한다."
+      }
+    },
+    {
+      "itemId": "hf-2611.17167",
+      "title": "Actor, Judge, or Teacher? Understanding Decision Models in Long-Horizon Agents",
+      "url": "https://huggingface.co/papers/2611.17167",
+      "oneliner": "에이전트 행동을 직접 잘 고르지 못하는 결정 모델도 행동을 평가해 정책 모델을 가르치는 교사로는 유용함을 보였다.",
+      "summary": [
+        "결정 모델은 주로 행동을 고르는 역할로만 평가되어 왔고, 행동이 서툰 모델이 가르치는 데도 서툰지는 불분명했다.",
+        "세 결정 모델과 세 일반 LLM을 ALFWorld에서 행동자와 평가자로 비교하고, JEV를 교사로 써서 강화학습 정책을 가르쳤다.",
+        "JEV를 교사로 쓰면 Qwen2.5-1.5B 정책의 성공률이 GRPO 대비 ALFWorld에서 72.8%에서 82.9%로, WebShop에서 56.8%에서 71.4%로 올랐다."
+      ],
+      "practical": "직접 쓰는 에이전트 설계와는 거리가 있지만, 에이전트 행동을 사후 평가하는 심판 모델을 학습 신호로 쓰는 아이디어는 흥미로운 참고 자료다.",
+      "difficulty": 3,
+      "label": "학습·추론 방법",
+      "terms": [
+        {
+          "term": "결정 모델",
+          "meaning": "선택지 중 하나를 고르고 각 선택지의 확률을 함께 내놓는 모델이다."
+        },
+        {
+          "term": "GRPO",
+          "meaning": "같은 질문에 대한 여러 응답을 서로 비교해 정책을 학습하는 강화학습 방법이다."
+        },
+        {
+          "term": "정책(policy)",
+          "meaning": "상황이 주어졌을 때 어떤 행동을 할지 정하는 모델이다."
+        },
+        {
+          "term": "ALFWorld/WebShop",
+          "meaning": "텍스트 환경에서 에이전트의 다단계 과제 수행을 평가하는 벤치마크이다."
+        }
+      ],
+      "abstract": "Decision models answer a question with a typed output, such as a choice among options with a probability for each, so one model can choose an agent's actions, evaluate actions already taken, or score every action to teach a policy with reinforcement learning. Prior work has studied them mainly as actors, judging their usefulness by how well they act. We ask whether a decision model that acts poorly can still teach well. We compare three decision models and three general LLMs as actors and judges on ALFWorld, and use JEV as a teacher on ALFWorld and WebShop. As actors, all six models are pulled away from a subgoal that must come first by an easier one. As judges that see the whole trajectory, the same models credit the steps toward that subgoal, and asking whether each action helped, rather than whether the task will succeed, separates useful from useless actions. As a teacher, JEV raises a Qwen2.5-1.5B policy over GRPO from 72.8% to 82.9% success on ALFWorld and from 56.8% to 71.4% on WebShop. These results suggest that a poor actor can still teach well, because judging an action after the episode ends reveals the consequences that acting must anticipate. Code is available at https://github.com/ZJU-REAL/decision-agents.",
+      "selection": {
+        "final": 76.2,
+        "relevance": 78,
+        "upvotes": 34,
+        "reason": "장기 호라이즌 LLM 에이전트의 의사결정 모델 설계와 도구 기반 행동 평가로 LLM 에이전트 설계 항목에 직접 부합."
+      }
+    },
+    {
+      "itemId": "hf-2611.12304",
+      "title": "Evolving Infra: Agent-Adaptive LLM Serving at Scale",
+      "url": "https://huggingface.co/papers/2611.12304",
+      "oneliner": "에이전트 작업의 특성에 맞춰 추론 서버의 연산 배분과 캐시 관리를 실시간으로 조정하는 서빙 시스템이다.",
+      "summary": [
+        "기존 prefill-decode 분리 서빙은 에이전트 부하에 유연하게 대응하지 못해 노드 간 불균형과 재사용될 KV 캐시 삭제가 생긴다.",
+        "Evolving Infra는 연산 배분과 KV 캐시 관리를 분리해 노드가 prefill과 decode를 오가게 하고, 온라인 플래너와 에이전트 인식 캐시 관리자로 분할과 캐시 축출을 조정한다.",
+        "코딩, 수학, 컴퓨터 사용 과제에서 Dynamo 대비 평균 요청 지연을 최대 4.1배, P95 TTFT를 최대 14배 줄였다."
+      ],
+      "practical": "코딩 에이전트처럼 컨텍스트를 반복 재사용하는 워크로드의 추론 서버를 운영한다면 KV 캐시 보존 전략과 PD 분리 비율 조정에 참고할 만하다.",
+      "difficulty": 3,
+      "label": "서빙·효율",
+      "terms": [
+        {
+          "term": "prefill-decode 분리",
+          "meaning": "입력을 처리하는 단계와 토큰을 생성하는 단계를 서로 다른 노드에서 실행하는 서빙 구조이다."
+        },
+        {
+          "term": "KV cache",
+          "meaning": "이전 토큰의 계산 결과를 저장해 두어 재계산을 피하는 메모리이다."
+        },
+        {
+          "term": "TTFT",
+          "meaning": "요청을 보낸 뒤 첫 토큰이 나오기까지 걸리는 시간이다."
+        },
+        {
+          "term": "P95",
+          "meaning": "요청의 95%가 이 값 이내에 처리됨을 뜻하는 지연 시간 지표이다."
+        }
+      ],
+      "abstract": "Agentic workloads are a major source of LLM inference demand. Existing prefill--decode (PD) disaggregated serving systems offer limited flexibility for runtime adaptation of compute allocation and KV cache management, and rely on coarse signals that only partly capture the diverse and dynamic agent workload. These limitations lead to load imbalance between prefill and decode nodes and eviction of KV caches that agents will reuse. We present Evolving Infra, an agent-adaptive serving framework that adapts compute allocation to agent workloads and KV cache management to agent context management at runtime. We decouple compute allocation from key--value (KV) cache management, allowing nodes to switch efficiently between prefill and decode. Building on this design, an online planner matches the PD split to workload composition, while an agent-aware distributed KV manager guides cache eviction and transfer with signals from agent context management. Across coding, math, and computer-use tasks with GLM-5.2 and Kimi K2.6 on up to 256 GB300 GPUs, Evolving Infra reduces mean end-to-end request latency and P95 TTFT by up to 4.1x and 14x over Dynamo, NVIDIA's production framework.",
+      "selection": {
+        "final": 74.6,
+        "relevance": 85,
+        "upvotes": 11,
+        "reason": "에이전트 워크로드 대상 LLM 추론 서빙과 지연 시간 최적화로 LLM 서빙 배포 항목과 직접 일치한다."
+      }
+    }
+  ]
+}
