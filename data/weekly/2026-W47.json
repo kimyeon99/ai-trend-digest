@@ -1,0 +1,193 @@
+{
+  "week": "2026-W47",
+  "period": {
+    "from": "2026-11-16",
+    "to": "2026-11-22"
+  },
+  "stats": {
+    "collected": 223,
+    "published": 5
+  },
+  "headline": "에이전트 장기 메모리 · 코딩 에이전트 벤치마크 · 프롬프트 인젝션 방어 · 에이전트 평가의 한계",
+  "papers": [
+    {
+      "itemId": "hf-2611.12068",
+      "title": "MIRIX-2.0: Multi-Agent Memory System",
+      "url": "https://huggingface.co/papers/2611.12068",
+      "oneliner": "LLM 에이전트가 과거 기록을 오래 기억하고 효율적으로 검색하도록 만든 멀티 에이전트 메모리 시스템을 제안한다.",
+      "summary": [
+        "장기 메모리는 학습이 필요하거나, 요약하다 세부 정보를 잃거나, 기록을 전부 쌓으면 검색 대상이 계속 커지는 문제가 있다.",
+        "MIRIX-2.0은 여섯 개의 유형별 메모리 에이전트가 전체 기록을 보관하고, 하이퍼그래프로 색인하며, 정해진 예산 안에서만 검색하도록 설계했다.",
+        "비교한 시스템 중 다섯 개 QA 벤치마크 가운데 네 곳에서 가장 정확했고, 파인튜닝 없이 닫힌 모델과 열린 모델 모두에서 동작한다."
+      ],
+      "practical": "에이전트 메모리를 설계할 때 원본 기록을 보존하고 검색 예산을 제한하며 정리 작업을 쓰기 경로 밖으로 빼는 구조를 참고할 수 있다.",
+      "difficulty": 2,
+      "label": "메모리·컨텍스트",
+      "terms": [
+        {
+          "term": "절차 기억(procedural memory)",
+          "meaning": "과거에 성공한 작업 방식을 스킬처럼 저장해 두고 다음 작업에 재사용하는 메모리다."
+        },
+        {
+          "term": "하이퍼그래프",
+          "meaning": "한 간선이 두 개 이상의 노드를 동시에 연결할 수 있는 그래프 구조다."
+        },
+        {
+          "term": "파인튜닝",
+          "meaning": "이미 학습된 모델을 추가 데이터로 다시 학습해 특정 용도에 맞추는 작업이다."
+        },
+        {
+          "term": "출처 추적(provenance)",
+          "meaning": "저장된 정보가 어떤 원본 기록에서 나왔는지 연결해 두는 것이다."
+        }
+      ],
+      "abstract": "Long-term memory lets LLM agents personalize, stay consistent, and reuse what worked before. Parametric memories need training, consolidation can lose details for good, and keeping every record leaves a growing store to search. We present MIRIX-2.0, a multi-agent memory system designed to be practical, accurate, and efficient at once. It is the most accurate of the compared systems on four of five QA benchmarks. It reaches 91.4% on LoCoMo and 72.6% on LongMemEval-S, where it leads the strongest baseline by 14.3 points, and with AutoDream disabled it gains 31.0 and 22.0 points over HyperMem on single-hop and multi-hop document QA. As procedural memory, it yields the highest mean success among the compared memory methods on ALFWorld and WebShop and reaches 49.2% on MetaClaw-Bench, against 44.0% for MetaClaw's skill library. Six typed memory agents keep complete records as the system of record, and a provenance hypergraph indexes episodic and semantic records with n-ary frames that cite their rows. Retrieval runs under explicit budgets, so the evidence a question inspects does not grow with the history. AutoDream merges duplicate anchors outside the write path without rewriting any record, and it distills task sessions into skills. With AutoDream disabled, MIRIX-2.0 answers faster than HyperMem on all five timed benchmarks. It needs no fine-tuning, runs with closed and open models, and its code is public.",
+      "selection": {
+        "final": 81.2,
+        "relevance": 82,
+        "upvotes": 57,
+        "reason": "멀티 에이전트 메모리 시스템으로 LLM 에이전트 설계(메모리) interests에 직접 해당한다."
+      }
+    },
+    {
+      "itemId": "hf-2611.20218",
+      "title": "SWE-CoWork: Benchmarking Coding Agents as Digital Employees in Organizations",
+      "url": "https://huggingface.co/papers/2611.20218",
+      "oneliner": "코딩 에이전트가 회사 동료와 협업하며 요구사항을 파악하고 구현까지 끝내는지 평가하는 벤치마크다.",
+      "summary": [
+        "실제 개발에서는 무엇을 만들지 동료에게 묻고 확인하는 과정이 필요한데, 기존 평가는 이를 제대로 다루지 못한다.",
+        "SWE-CoWork는 101개 저장소 기반 과제를 가상 조직의 동료 26명과 함께 배치하고, 흩어진 요구사항을 찾아 구현하게 한 뒤 비공개 테스트로 평가한다.",
+        "상위 두 모델은 실패→통과 테스트의 약 63%를 만족했지만 과제를 끝까지 완수한 비율은 8% 미만이었다."
+      ],
+      "practical": "코딩 에이전트를 실무에 도입할 때 요구사항 추적과 검증 단계가 가장 약한 지점이라는 점을 감안해 사람의 확인 절차를 남겨 두는 편이 좋다.",
+      "difficulty": 1,
+      "label": "평가·벤치마크",
+      "terms": [
+        {
+          "term": "fail-to-pass(F2P) 테스트",
+          "meaning": "수정 전에는 실패하고 올바르게 수정하면 통과해야 하는 테스트다."
+        },
+        {
+          "term": "핸드오프",
+          "meaning": "작업을 다른 사람이나 에이전트에게 넘기며 전달하는 간단한 인수인계 내용이다."
+        }
+      ],
+      "abstract": "A coding agent working within a software organization must establish what to build, collaborate with colleagues, and verify what it delivers. We introduce SWE-CoWork, a benchmark comprising 101 development assignments across 101 real repositories, 11 programming languages, and 12 application domains. Each assignment places an agent in a simulated engineering organization with 26 colleagues who have distinct responsibilities, bounded knowledge, and controlled collaboration behavior. Starting from a brief handoff, agents must recover requirements distributed across colleagues and workplace records, reconcile conflicting evidence, and implement changes evaluated by private executable tests. We evaluate eleven models and find a substantial gap between partial implementation and complete task delivery. The two leading models satisfy approximately 63% of fail-to-pass (F2P) tests but complete fewer than 8% of assignments. Providing complete requirements upfront improves F2P by approximately 16 percentage points for Seed Evolving and GPT-6 Astra, yet leaves complete task success unchanged. Requirement-level trajectory analysis reveals failures throughout the delivery process: Claude-Opus-5.5 directs a mean of 93% of first questions about queried cards to their accountable owners across runs but obtains only 64% of colleague-held requirements. Deferred questions go unfollowed, implementations remain incomplete even after requirements are acquired, and 31% of requirements reported as completed fail their tests. These findings highlight sustained requirement tracking, from clarification through implementation, verification, and handoff, as a key challenge for reliable autonomous software engineering.",
+      "selection": {
+        "final": 79.4,
+        "relevance": 80,
+        "upvotes": 53,
+        "reason": "코딩 에이전트를 조직 내 개발자로 평가하는 벤치마크로 AI 코딩 도구 관심사와 직접 일치한다."
+      }
+    },
+    {
+      "itemId": "hf-2611.15789",
+      "title": "VibePrevisBench: Evaluating Agentic Coding for 4D Scene Generation in Blender",
+      "url": "https://huggingface.co/papers/2611.15789",
+      "oneliner": "코딩 에이전트가 Blender에서 4D 장면을 코드로 만들어 영상까지 렌더링하는 능력을 평가하는 벤치마크다.",
+      "summary": [
+        "코딩 에이전트로 Blender 장면을 구성해 영상 생성의 기준 영상을 만들 수 있지만, 이를 길고 여러 샷으로 된 장면까지 검증하는 벤치마크가 없다.",
+        "VibePrevisBench는 242개 과제를 두고 코드를 다시 실행해 정답 사실과 비교하는 검사와, VLM 심사자가 영상에서 그 사실이 보이는지 보는 검사를 함께 쓴다.",
+        "11개 에이전트를 분석한 결과 공간과 카메라 이해가 성능을 가르고, 어려운 요청에서 실패하며, 자기 렌더링을 보고도 오류를 고치지 못했다."
+      ],
+      "practical": "Blender 기반 영상 장면 생성은 프로필의 관심 분야와 거의 무관하므로 실무 활용도는 낮고, 에이전트가 자기 결과를 보고도 고치지 못한다는 관찰 정도만 참고할 만하다.",
+      "difficulty": 2,
+      "label": "평가·벤치마크",
+      "terms": [
+        {
+          "term": "4D 장면",
+          "meaning": "3차원 공간에 시간에 따른 움직임이 더해진 장면이다."
+        },
+        {
+          "term": "VLM",
+          "meaning": "이미지나 영상을 함께 이해하는 언어 모델이다."
+        },
+        {
+          "term": "그레이박스",
+          "meaning": "세부 질감 없이 배치와 움직임만 단순한 형태로 보여주는 임시 영상이다."
+        }
+      ],
+      "abstract": "Controllable real-world video generation models can condition on a rendered graybox proxy video, which fixes layout, motion and camera. Coding agents can build such videos by reconstructing a 4D scene in Blender, yet no benchmark checks both these videos and the long, multi-shot scenes behind them. We introduce VibePrevisBench, a benchmark for 4D scene reconstruction: an agent turns a brief into an executable 4D scene and renders its proxy video. Its 242 tasks span four input kinds, including scripts, photos, continuations, and reference videos. Each delivery is scored along two evaluation dimensions. Rule-based Scene Check re-runs the code and compares the exported 4D scene with hidden ground truth facts in nine dimensions. VLM-based Screen Check asks a VLM judge whether the facts that pass can be recognized in the proxy video. We analyze the evaluation results and trajectories of 11 frontier coding agents and identify three key observations. First, multimodal understanding separates the agents, especially in understanding space and camera motion. Second, all agents seem to already master basic camera work and staging, and fail at challenging requests. Third, agents inspect their own renders but fail to correct their errors. Agents thus need better visual understanding of space and camera, explicit checks for challenging requests, and item-by-item verification of renders against the brief.",
+      "selection": {
+        "final": 76.6,
+        "relevance": 72,
+        "upvotes": 87,
+        "reason": "코딩 에이전트 평가 벤치마크로 AI 코딩 도구 interests와 평가 벤치마크 curious에 가깝다."
+      }
+    },
+    {
+      "itemId": "hf-2611.07222",
+      "title": "SPILLWAY: Separating Target Admission from Sanitization to Defend Tool-Using Agents against Prompt Injection",
+      "url": "https://huggingface.co/papers/2611.07222",
+      "oneliner": "도구를 쓰는 AI 에이전트가 프롬프트 인젝션에 속아 엉뚱한 곳으로 데이터나 돈을 보내지 못하게 막는 결정적 방어 방법이다.",
+      "summary": [
+        "웹 페이지나 문서에 숨은 지시가 이메일, 파일, 결제를 쓰는 에이전트를 속일 수 있고, 기존 방어는 모델 판단에 의존하거나 호출을 늘린다.",
+        "SPILLWAY는 행동의 대상 값이 읽기 전용 도구의 타입 필드에서 왔는지를 규칙으로 검사하고, 지시처럼 보이는 텍스트는 고정 규칙으로 제거한다.",
+        "세 가지 백본에서 표준 템플릿 인젝션이 공격자 목표로 행동을 돌리지 못했고, 추가 모델 호출도 거의 없이 높은 유용성을 유지했다."
+      ],
+      "practical": "도구 호출 에이전트를 만들 때 수신자나 계좌 같은 대상 값을 타입 있는 도구 반환값에서만 허용하는 결정적 검사를 넣으면 LLM 판단 없이 보안 하한선을 만들 수 있다.",
+      "difficulty": 2,
+      "label": "멀티 에이전트",
+      "terms": [
+        {
+          "term": "프롬프트 인젝션",
+          "meaning": "외부 텍스트에 숨긴 지시로 모델이 의도하지 않은 행동을 하게 만드는 공격이다."
+        },
+        {
+          "term": "백본",
+          "meaning": "에이전트 안에서 실제로 추론을 담당하는 기반 언어 모델이다."
+        },
+        {
+          "term": "새니타이저",
+          "meaning": "입력에서 위험한 내용을 걸러 내거나 제거하는 처리 단계다."
+        },
+        {
+          "term": "출처 기반 방어(provenance)",
+          "meaning": "값이나 지시가 어디에서 왔는지를 추적해 허용 여부를 판단하는 방식이다."
+        }
+      ],
+      "abstract": "Tool-using agents act on email, files, and payments, so an instruction hidden in a web page or a shared document can make an agent send data or money to an attacker. Many runtime defenses put a language model on the decision that lets an action through, so the decision depends on a model that may read the attacker's text and adds model calls to every step. Provenance defenses keep the model off the final check but need a model to plan or route each task first. Where an action goes can instead be read from the tools' typed returns: an email's sender or a payment's account arrives in a typed field, while injected instructions arrive as free text. SPILLWAY turns this observation into a deterministic floor with no per-task plan. The check admits a call when each target value that appears in tool output but not in the user's task was returned by a read-only tool in a typed field or is covered by a fixed delegation rule. A deterministic sanitizer removes instruction-like regions its fixed rules match before the model reads them and retains the removed spans as evidence, and a local judge may restore a refused call, never one whose target lies in the removed text. Across three backbones, and seven task suites on one of them, no standard templated injection redirects an action to an attacker's target under SPILLWAY, at the highest observed mean utility and composite scores (NRP, ERS) of the defenses we run under that attack. A forged chat template also produces a raw zero, and mean in-scope attack success under a released reinforcement-learning attacker is .007. SPILLWAY reaches this floor with no defense-triggered backbone re-run and almost no added model call. As personal AI agents act on users' email, files, and payments, SPILLWAY gives them an auditable refusal floor on where their actions go that keeps them useful and holds across backbones.",
+      "selection": {
+        "final": 73.1,
+        "relevance": 72,
+        "upvotes": 47,
+        "reason": "도구 호출 에이전트의 프롬프트 인젝션 방어로 LLM 에이전트 설계 관심사와 직접 맞닿아 있다."
+      }
+    },
+    {
+      "itemId": "hf-2611.20882",
+      "title": "Accelerate Bench: Evaluating Agents for Application-Level Program Optimization",
+      "url": "https://huggingface.co/papers/2611.20882",
+      "oneliner": "코딩 에이전트가 프로그램 전체를 더 빠르게 최적화할 수 있는지 평가하는 벤치마크다.",
+      "summary": [
+        "애플리케이션 최적화는 여러 변경을 조율하면서 결과의 정확성을 지켜야 하지만, 이를 평가하는 기준이 부족했다.",
+        "Accelerate Bench는 과학 응용과 슈퍼컴퓨팅 대회에서 가져온 32개 CPU 최적화 과제를 주고, 별도 검증기로 최종 제출물을 채점한다.",
+        "16개 에이전트의 Score@1은 25.5%에서 67.4%까지 갈렸고, 같은 코드도 빌드와 런타임 설정만으로 속도가 크게 달라졌다."
+      ],
+      "practical": "코딩 에이전트에게 성능 최적화를 맡길 때 코드 수정뿐 아니라 빌드와 런타임 설정까지 함께 점검해야 한다는 점을 참고할 수 있다.",
+      "difficulty": 2,
+      "label": "평가·벤치마크",
+      "terms": [
+        {
+          "term": "Score@1",
+          "meaning": "에이전트가 한 번 시도해 얻은 결과로 계산한 점수다."
+        },
+        {
+          "term": "하네스",
+          "meaning": "모델이 도구를 쓰고 작업을 수행하도록 감싸는 실행 환경이다."
+        },
+        {
+          "term": "궤적(trajectory)",
+          "meaning": "에이전트가 작업 중 거친 행동과 관찰의 전체 기록이다."
+        }
+      ],
+      "abstract": "Application optimization requires coding agents to discover useful changes and coordinate them across a complete program while preserving the required computation. We introduce Accelerate Bench, a benchmark of 32 CPU optimization tasks adapted from scientific applications and supercomputing competitions. Each task provides a working program and specifies the workload, correctness requirements, timing boundaries, and permitted edits, leaving agents to choose where and how to optimize. Public testing supports iterative development, and a separate verifier scores the final submission. On benchmark version 1.1, we evaluate 16 coding agents, each pairing a model with a harness. Their Score@1 ranges from 25.5% to 67.4%. Most of their programs are correct, and the size of the speedup separates them: the two leading agents are at least 2x faster on 22 or more of the 32 tasks, while the other fourteen reach 2x on 8 to 17 and leave 125 of their 412 correct outcomes below 1.25x. Controlled replays show why coordination across an application matters: identical source code runs between 0.29x and 2.12x depending only on build and runtime settings, and one code change is worth 1.01x or 6.4x depending on another. Accelerate Bench pairs executable workloads with agents' programs and trajectories to evaluate both their gains and the process behind them.",
+      "selection": {
+        "final": 72.4,
+        "relevance": 78,
+        "upvotes": 20,
+        "reason": "코딩 에이전트의 애플리케이션 수준 프로그램 최적화 벤치마크로 AI 코딩 도구 관심사와 맞닿아 있다."
+      }
+    }
+  ]
+}
